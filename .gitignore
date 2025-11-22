@@ -48,3 +48,9 @@ application-local.properties
 ### OS ###
 .DS_Store
 Thumbs.db
+
+# Discipline-specific README files
+README-JAVA.md
+README-DEVOPS.md
+README-QA.md
+README-MOBILE.md
