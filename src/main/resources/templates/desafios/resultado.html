@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Resultado - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card text-center">
+            <div class="card-body p-5">
+              <div class="mb-4">
+                <h1 class="display-1">🎉</h1>
+              </div>
+              <h2 class="mb-3">Desafio Concluído!</h2>
+
+              <div th:if="${resultado != null}">
+                <p class="text-muted mb-3">
+                  <span th:text="${resultado.pontuacao}">2</span> /
+                  <span th:text="${resultado.totalPerguntas}">3</span> acertos
+                </p>
+                <h3 class="text-primary mb-4">
+                  <span
+                    th:text="${#numbers.formatDecimal((resultado.pontuacao / resultado.totalPerguntas) * 100, 0, 0)}"
+                    >67</span
+                  >%
+                </h3>
+
+                <div class="alert alert-warning mb-4">
+                  <i class="fas fa-trophy"></i>
+                  <strong
+                    >+<span th:text="${resultado.pontosGanhos}">140</span>
+                    pontos</strong
+                  >
+                </div>
+
+                <div
+                  th:if="${trofeuPerfeito != null and trofeuPerfeito}"
+                  class="alert alert-success mb-4"
+                >
+                  <h5>
+                    <i class="fas fa-trophy text-warning"></i> Troféu
+                    Conquistado!
+                  </h5>
+                  <p class="mb-0">
+                    <strong>🏆 Perfeito</strong><br />
+                    <small>Você acertou todas as perguntas!</small>
+                  </p>
+                </div>
+              </div>
+
+              <div th:if="${sucesso}" class="alert alert-success">
+                <span th:text="${sucesso}"></span>
+              </div>
+
+              <div class="d-grid gap-2">
+                <a
+                  th:href="@{/desafios/{id}/quiz(id=${desafio.id})}"
+                  class="btn btn-primary btn-lg"
+                >
+                  <i class="fas fa-redo"></i> Jogar Novamente
+                </a>
+                <a href="/desafios" class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Meus Cursos - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <h1 class="mb-4">
+        <i class="fas fa-book-open text-primary"></i> Meus Cursos
+      </h1>
+
+      <!-- Cursos em Andamento -->
+      <section th:if="${cursosEmAndamento != null and !cursosEmAndamento.empty}" class="mb-5">
+        <h3 class="mb-3">
+          <i class="fas fa-spinner text-primary"></i> Cursos em Andamento
+        </h3>
+        <div class="row">
+          <div class="col-md-6 mb-4" th:each="uc : ${cursosEmAndamento}">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h5 class="card-title">
+                      <span th:text="${uc.curso.icone}">📚</span>
+                      <span th:text="${uc.curso.titulo}">Título do Curso</span>
+                    </h5>
+                    <p class="text-muted small mb-2">
+                      <span class="badge bg-primary" th:text="${uc.curso.area}">Área</span>
+                      <span class="badge bg-info" th:text="${uc.curso.nivel}">Nível</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between mb-1">
+                    <small class="text-muted">Progresso</small>
+                    <small class="text-muted" th:text="${uc.progresso} + '%'">45%</small>
+                  </div>
+                  <div class="progress" style="height: 25px">
+                    <div
+                      class="progress-bar progress-bar-striped progress-bar-animated"
+                      th:style="'width: ' + ${uc.progresso} + '%;'"
+                      th:text="${uc.progresso} + '%'"
+                    >
+                      45%
+                    </div>
+                  </div>
+                </div>
+                <a
+                  th:href="@{/cursos/{id}(id=${uc.curso.id})}"
+                  class="btn btn-primary"
+                >
+                  <i class="fas fa-play"></i> Continuar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cursos Concluídos -->
+      <section th:if="${cursosConcluidos != null and !cursosConcluidos.empty}">
+        <h3 class="mb-3">
+          <i class="fas fa-check-circle text-success"></i> Cursos Concluídos
+        </h3>
+        <div class="row">
+          <div class="col-md-6 mb-4" th:each="uc : ${cursosConcluidos}">
+            <div class="card h-100 border-success">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h5 class="card-title">
+                      <span th:text="${uc.curso.icone}">📚</span>
+                      <span th:text="${uc.curso.titulo}">Título do Curso</span>
+                    </h5>
+                    <p class="text-muted small mb-2">
+                      <span class="badge bg-success">
+                        <i class="fas fa-check"></i> Concluído
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <p class="text-muted small" th:if="${uc.concluidoEm}">
+                  Concluído em: <span th:text="${#temporals.format(uc.concluidoEm, 'dd/MM/yyyy')}"></span>
+                </p>
+                <a
+                  th:href="@{/cursos/{id}(id=${uc.curso.id})}"
+                  class="btn btn-outline-success"
+                >
+                  <i class="fas fa-eye"></i> Ver Detalhes
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mensagem quando não há cursos -->
+      <div
+        th:if="${(cursosEmAndamento == null or cursosEmAndamento.empty) and (cursosConcluidos == null or cursosConcluidos.empty)}"
+        class="alert alert-info text-center"
+      >
+        <i class="fas fa-info-circle"></i> Você ainda não está inscrito em nenhum curso.
+        <a href="/cursos" class="alert-link">Explorar cursos disponíveis</a>
+      </div>
+    </div>
+  </body>
+</html>
+
+
+
+
+
+

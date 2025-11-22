@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Aprenda+ - Plataforma Educacional Gamificada')}"
+>
+  <body>
+    <div id="conteudo">
+      <!-- Hero Section -->
+      <section class="hero bg-primary text-white text-center py-5 rounded mb-5">
+        <div class="container">
+          <h1 class="display-4 mb-3">
+            <i class="fas fa-graduation-cap"></i> Bem-vindo ao Aprenda+
+          </h1>
+          <p class="lead">
+            Aprenda de forma gamificada e alcance seus objetivos profissionais
+          </p>
+          <div class="mt-4" sec:authorize="!isAuthenticated()">
+            <a href="/cadastro" class="btn btn-light btn-lg me-2"
+              >Começar Agora</a
+            >
+            <a href="/login" class="btn btn-outline-light btn-lg">Entrar</a>
+          </div>
+          <div class="mt-4" sec:authorize="isAuthenticated()">
+            <a href="/dashboard" class="btn btn-light btn-lg me-2"
+              >Ir para Dashboard</a
+            >
+            <a href="/cursos" class="btn btn-outline-light btn-lg"
+              >Explorar Cursos</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Cursos Sugeridos/Destaques -->
+      <section th:if="${cursosSugeridos != null and !cursosSugeridos.empty}">
+        <h2 class="mb-4">Cursos Sugeridos para Você</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4" th:each="curso : ${cursosSugeridos}">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <span th:text="${curso.icone}">📚</span>
+                  <span th:text="${curso.titulo}">Título do Curso</span>
+                </h5>
+                <p
+                  class="card-text"
+                  th:text="${#strings.abbreviate(curso.descricao, 100)}"
+                >
+                  Descrição do curso...
+                </p>
+                <p class="text-muted">
+                  <small>
+                    <i class="fas fa-tag"></i>
+                    <span th:text="${curso.area}">Área</span> |
+                    <i class="fas fa-signal"></i>
+                    <span th:text="${curso.nivel}">Nível</span> |
+                    <i class="fas fa-clock"></i>
+                    <span th:text="${curso.duracao}">Duração</span>
+                  </small>
+                </p>
+                <a
+                  th:href="@{/cursos/{id}(id=${curso.id})}"
+                  class="btn btn-primary"
+                  >Ver Detalhes</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cursos Populares (público) -->
+      <section th:if="${cursosPopulares != null and !cursosPopulares.empty}">
+        <h2 class="mb-4">Cursos Populares</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4" th:each="curso : ${cursosPopulares}">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <span th:text="${curso.icone}">📚</span>
+                  <span th:text="${curso.titulo}">Título do Curso</span>
+                </h5>
+                <p
+                  class="card-text"
+                  th:text="${#strings.abbreviate(curso.descricao, 100)}"
+                >
+                  Descrição do curso...
+                </p>
+                <p class="text-muted">
+                  <small>
+                    <i class="fas fa-star text-warning"></i>
+                    <span th:text="${curso.avaliacao}">4.5</span> |
+                    <i class="fas fa-users"></i>
+                    <span th:text="${curso.totalAulas}">12 aulas</span>
+                  </small>
+                </p>
+                <a
+                  th:href="@{/cursos/{id}(id=${curso.id})}"
+                  class="btn btn-primary"
+                  >Ver Detalhes</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="mt-5">
+        <h2 class="mb-4 text-center">Por que escolher o Aprenda+?</h2>
+        <div class="row">
+          <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-gamepad fa-3x text-primary mb-3"></i>
+            <h4>Gamificação</h4>
+            <p>Evolua ganhando pontos, troféus e subindo no ranking</p>
+          </div>
+          <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-route fa-3x text-primary mb-3"></i>
+            <h4>Trilhas Personalizadas</h4>
+            <p>Siga trilhas de aprendizado adaptadas ao seu perfil</p>
+          </div>
+          <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+            <h4>IA Generativa</h4>
+            <p>Receba recomendações inteligentes baseadas no seu progresso</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

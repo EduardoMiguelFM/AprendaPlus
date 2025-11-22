@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:fragment="layout (conteudo, titulo)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo != null ? titulo : 'Aprenda+'}">Aprenda+</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}" />
+    <meta
+      th:if="${_csrf != null}"
+      name="_csrf_header"
+      th:content="${_csrf.headerName}"
+    />
+    <style>
+      body {
+        background: linear-gradient(
+          180deg,
+          #eef2ff 0%,
+          #f5f6fb 60%,
+          #f7f9fc 100%
+        );
+        min-height: 100vh;
+      }
+      main.container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+      }
+      .surface-section {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 1.75rem;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        margin-bottom: 1.5rem;
+      }
+      .timeline {
+        position: relative;
+        padding-left: 1.75rem;
+        border-left: 2px dashed rgba(15, 23, 42, 0.15);
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+      .timeline-point {
+        position: absolute;
+        left: -9px;
+        top: 18px;
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.2);
+      }
+      .timeline-content {
+        background: #fff;
+        border-radius: 18px;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+      }
+      .navbar-brand {
+        font-weight: bold;
+      }
+      .card {
+        transition: transform 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      /* Animações Gamificadas */
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      @keyframes glow {
+        0%,
+        100% {
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+      }
+
+      .nivel-badge {
+        animation: pulse 2s infinite;
+        transition: transform 0.3s ease;
+      }
+
+      .nivel-badge:hover {
+        transform: scale(1.1) rotate(5deg);
+      }
+
+      .progress-bar-animated {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-bar-animated::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-image: linear-gradient(
+          -45deg,
+          rgba(255, 255, 255, 0.2) 25%,
+          transparent 25%,
+          transparent 50%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.2) 75%,
+          transparent 75%,
+          transparent
+        );
+        background-size: 1rem 1rem;
+        animation: progress-bar-stripes 1s linear infinite;
+      }
+
+      @keyframes progress-bar-stripes {
+        0% {
+          background-position: 1rem 0;
+        }
+        100% {
+          background-position: 0 0;
+        }
+      }
+
+      /* Efeito de brilho para badges de nível */
+      .nivel-badge::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.3) 0%,
+          transparent 70%
+        );
+        animation: rotate 3s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Layout moderno reutilizável */
+      .dashboard-hero {
+        background: radial-gradient(
+            circle at top right,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          ),
+          linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+        border: 0;
+        border-radius: 24px;
+        color: #fff;
+        overflow: hidden;
+      }
+      .dashboard-hero .badge-level {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-weight: 600;
+      }
+      .metric-card {
+        border: 0;
+        border-radius: 20px;
+        padding: 18px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+      .metric-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 12px;
+      }
+      .progress-card {
+        border-radius: 20px;
+        border: 0;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+      }
+      .section-title {
+        font-weight: 700;
+        color: #1e293b;
+      }
+      .journey-step {
+        border-left: 3px solid #e2e8f0;
+        padding-left: 16px;
+        margin-left: 8px;
+        position: relative;
+      }
+      .journey-step::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #4b6cb7;
+        position: absolute;
+        left: -7px;
+        top: 4px;
+      }
+      .ia-chat-card {
+        border-radius: 24px;
+        border: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+      }
+      .ia-chat-card .card-body {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 1.5rem;
+      }
+      .ia-chat-input .form-control {
+        border-radius: 999px;
+        border: 0;
+        padding: 0.85rem 1.2rem;
+      }
+      .ia-chat-input .btn {
+        border-radius: 999px;
+        padding: 0.75rem 1.5rem;
+      }
+      .dashboard-hero,
+      .dashboard-hero h1,
+      .dashboard-hero h2,
+      .dashboard-hero h3,
+      .dashboard-hero p,
+      .dashboard-hero span,
+      .dashboard-hero small,
+      .dashboard-hero label {
+        color: #ffffff;
+      }
+      .dashboard-hero .badge-level,
+      .dashboard-hero .badge {
+        color: #ffffff;
+      }
+      .dashboard-hero .btn-outline-light {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+      .dashboard-hero .hero-info-box {
+        color: #1e293b;
+      }
+      .dashboard-hero .hero-info-box p,
+      .dashboard-hero .hero-info-box small {
+        color: #475569;
+      }
+      .dashboard-hero .hero-info-box h2,
+      .dashboard-hero .hero-info-box h5 {
+        color: #1e293b !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="/" sec:authorize="!isAuthenticated()">
+          <i class="fas fa-graduation-cap"></i> Aprenda+
+        </a>
+        <a
+          class="navbar-brand"
+          href="/dashboard"
+          sec:authorize="isAuthenticated()"
+        >
+          <i class="fas fa-graduation-cap"></i> Aprenda+
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto" sec:authorize="isAuthenticated()">
+            <li class="nav-item">
+              <a class="nav-link" href="/cursos">Cursos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/cursos/sugeridos">Sugeridos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/desafios">Desafios</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/trilhas">Trilhas</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav" sec:authorize="!isAuthenticated()">
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Entrar</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/cadastro">Cadastrar</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav" sec:authorize="isAuthenticated()">
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/perfil">Perfil</a>
+            </li>
+            <li class="nav-item">
+              <form
+                th:action="@{/logout}"
+                method="post"
+                style="display: inline; margin: 0"
+              >
+                <button
+                  type="submit"
+                  class="nav-link border-0 bg-transparent text-white"
+                  style="
+                    cursor: pointer;
+                    padding: 0.5rem 1rem;
+                    color: rgba(255, 255, 255, 0.55) !important;
+                  "
+                >
+                  Sair
+                </button>
+                <input
+                  type="hidden"
+                  th:name="${_csrf.parameterName}"
+                  th:value="${_csrf.token}"
+                />
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Conteúdo -->
+    <main class="container mt-4">
+      <div
+        th:if="${mensagem}"
+        class="alert alert-info alert-dismissible fade show"
+      >
+        <span th:text="${mensagem}"></span>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      <div
+        th:if="${erro}"
+        class="alert alert-danger alert-dismissible fade show"
+      >
+        <span th:text="${erro}"></span>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+
+      <div th:replace="${conteudo}">
+        <!-- Conteúdo específico da página será inserido aqui -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light mt-5 py-4">
+      <div class="container text-center">
+        <p>&copy; 2024 Aprenda+. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      (function () {
+        const getCsrf = () => {
+          const tokenMeta = document.querySelector('meta[name="_csrf"]');
+          const headerMeta = document.querySelector(
+            'meta[name="_csrf_header"]'
+          );
+          return {
+            token: tokenMeta ? tokenMeta.getAttribute("content") : null,
+            header: headerMeta ? headerMeta.getAttribute("content") : null,
+          };
+        };
+
+        function adicionarMensagemChat(tipo, texto) {
+          const container = document.getElementById("chatContainer");
+          if (!container) return "";
+
+          const mensagemId = "msg-" + Date.now();
+          const isUsuario = tipo === "usuario";
+
+          const div = document.createElement("div");
+          div.id = mensagemId;
+          div.className = "mb-2";
+          div.innerHTML = `
+            <div class="d-flex ${
+              isUsuario ? "justify-content-end" : "justify-content-start"
+            }">
+              <div class="alert ${
+                isUsuario ? "alert-primary" : "alert-secondary"
+              }" style="max-width: 80%;">
+                ${
+                  isUsuario
+                    ? '<i class="fas fa-user"></i>'
+                    : '<i class="fas fa-robot"></i>'
+                } 
+                <strong>${isUsuario ? "Você" : "Assistente IA"}:</strong><br>
+                ${texto}
+              </div>
+            </div>
+          `;
+
+          container.appendChild(div);
+          container.scrollTop = container.scrollHeight;
+          return mensagemId;
+        }
+
+        function enviarMensagem() {
+          const input = document.getElementById("chatInput");
+          if (!input) return;
+
+          const mensagem = input.value.trim();
+          if (!mensagem) return;
+
+          adicionarMensagemChat("usuario", mensagem);
+          input.value = "";
+
+          const loadingId = adicionarMensagemChat("assistente", "Pensando...");
+          const { token, header } = getCsrf();
+
+          const headers = {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          };
+          if (token && header) {
+            headers[header] = token;
+          }
+
+          fetch("/api/ia/chat", {
+            method: "POST",
+            headers,
+            credentials: "same-origin",
+            body: JSON.stringify({ mensagem }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              const loadingEl = document.getElementById(loadingId);
+              if (loadingEl) loadingEl.remove();
+              adicionarMensagemChat("assistente", data.resposta);
+            })
+            .catch(() => {
+              const loadingEl = document.getElementById(loadingId);
+              if (loadingEl) loadingEl.remove();
+              adicionarMensagemChat(
+                "assistente",
+                "Desculpe, ocorreu um erro. Por favor, tente novamente."
+              );
+            });
+        }
+
+        function inicializarAssistenteIA() {
+          const chatInput = document.getElementById("chatInput");
+          const chatSendBtn = document.getElementById("chatSendBtn");
+
+          if (!chatInput || !chatSendBtn) {
+            return;
+          }
+
+          if (!chatInput.dataset.listenerAttached) {
+            chatInput.addEventListener("keypress", function (event) {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                enviarMensagem();
+              }
+            });
+            chatInput.dataset.listenerAttached = "true";
+          }
+
+          if (!chatSendBtn.dataset.listenerAttached) {
+            chatSendBtn.addEventListener("click", enviarMensagem);
+            chatSendBtn.dataset.listenerAttached = "true";
+          }
+        }
+
+        function tentarInicializar() {
+          if (document.getElementById("chatInput")) {
+            inicializarAssistenteIA();
+          }
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", tentarInicializar);
+        } else {
+          tentarInicializar();
+        }
+
+        window.enviarMensagem = enviarMensagem;
+        window.adicionarMensagemChat = adicionarMensagemChat;
+      })();
+      /*]]>*/
+    </script>
+    <!-- Script para áreas de interesse (carregado apenas na página de onboarding) -->
+    <script
+      th:if="${loadAreasScript != null and loadAreasScript == true}"
+      src="/js/areas-interesse.js"
+    ></script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      document.addEventListener("DOMContentLoaded", function () {
+        const quizRoot = document.querySelector('[data-page="quiz"]');
+        if (!quizRoot) {
+          return;
+        }
+
+        const quizForm = quizRoot.querySelector("#quizForm");
+        if (!quizForm) {
+          return;
+        }
+
+        const perguntas = Array.from(
+          quizRoot.querySelectorAll(".pergunta-item")
+        );
+        const btnAnterior = quizRoot.querySelector("#btnAnterior");
+        const btnProximo = quizRoot.querySelector("#btnProximo");
+        const btnFinalizar = quizRoot.querySelector("#btnFinalizar");
+        const progressoBar = quizRoot.querySelector("#progressoBar");
+        const progressoTexto = quizRoot.querySelector("#progressoTexto");
+        const indicadorPergunta = quizRoot.querySelector("#indicadorPergunta");
+        const aviso = quizRoot.querySelector("#quizAviso");
+
+        if (!perguntas.length) {
+          btnAnterior?.classList.add("d-none");
+          btnProximo?.classList.add("d-none");
+          btnFinalizar?.classList.add("d-none");
+          if (progressoBar) progressoBar.style.width = "0%";
+          if (progressoTexto) progressoTexto.textContent = "0 / 0";
+          return;
+        }
+
+        let perguntaAtual = 0;
+        const respostasUsuario = new Array(perguntas.length).fill(null);
+        const inicioTempo = Date.now();
+
+        function exibirAviso(texto) {
+          if (!aviso) return;
+          if (texto) {
+            aviso.textContent = texto;
+            aviso.classList.remove("d-none");
+          } else {
+            aviso.textContent = "";
+            aviso.classList.add("d-none");
+          }
+        }
+
+        function atualizarProgresso() {
+          const percentual = ((perguntaAtual + 1) / perguntas.length) * 100;
+          if (progressoBar) progressoBar.style.width = percentual + "%";
+          if (progressoTexto)
+            progressoTexto.textContent = `${perguntaAtual + 1} / ${
+              perguntas.length
+            }`;
+          if (indicadorPergunta)
+            indicadorPergunta.textContent = perguntaAtual + 1;
+        }
+
+        function atualizarBotoes() {
+          if (btnAnterior)
+            btnAnterior.style.display =
+              perguntaAtual === 0 ? "none" : "inline-flex";
+          if (btnProximo)
+            btnProximo.style.display =
+              perguntaAtual === perguntas.length - 1 ? "none" : "inline-flex";
+          if (btnFinalizar)
+            btnFinalizar.style.display =
+              perguntaAtual === perguntas.length - 1 ? "inline-flex" : "none";
+        }
+
+        function mostrarPergunta(indice) {
+          perguntas.forEach((pergunta, idx) => {
+            pergunta.style.display = idx === indice ? "block" : "none";
+            if (idx === indice && respostasUsuario[idx] !== null) {
+              const inputMarcado = pergunta.querySelector(
+                `input[name="resposta[${idx}]"][value="${respostasUsuario[idx]}"]`
+              );
+              if (inputMarcado) inputMarcado.checked = true;
+            }
+          });
+          exibirAviso("");
+          atualizarProgresso();
+          atualizarBotoes();
+        }
+
+        function registrarRespostaAtual() {
+          const pergunta = perguntas[perguntaAtual];
+          if (!pergunta) {
+            return false;
+          }
+          const selecionada = pergunta.querySelector(
+            'input[type="radio"]:checked'
+          );
+          if (!selecionada) {
+            exibirAviso("Selecione uma resposta para continuar.");
+            return false;
+          }
+          respostasUsuario[perguntaAtual] = parseInt(selecionada.value, 10);
+          exibirAviso("");
+          return true;
+        }
+
+        function irParaAnterior(event) {
+          event?.preventDefault();
+          if (perguntaAtual === 0) {
+            return;
+          }
+          perguntaAtual--;
+          mostrarPergunta(perguntaAtual);
+        }
+
+        function irParaProxima(event) {
+          event?.preventDefault();
+          if (!registrarRespostaAtual()) {
+            return;
+          }
+          if (perguntaAtual < perguntas.length - 1) {
+            perguntaAtual++;
+            mostrarPergunta(perguntaAtual);
+          } else {
+            atualizarBotoes();
+          }
+        }
+
+        btnAnterior?.addEventListener("click", irParaAnterior);
+        btnProximo?.addEventListener("click", irParaProxima);
+
+        quizForm.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            if (perguntaAtual === perguntas.length - 1) {
+              if (registrarRespostaAtual()) {
+                quizForm.requestSubmit(btnFinalizar);
+              }
+            } else {
+              irParaProxima();
+            }
+          }
+        });
+
+        quizForm.addEventListener("submit", (event) => {
+          if (!registrarRespostaAtual()) {
+            event.preventDefault();
+            return;
+          }
+
+          let acertos = 0;
+          perguntas.forEach((pergunta, idx) => {
+            const correto = parseInt(pergunta.dataset.correto ?? "0", 10);
+            if (respostasUsuario[idx] === correto) {
+              acertos++;
+            }
+          });
+
+          const pontuacaoInput = quizRoot.querySelector("#pontuacao");
+          const tempoGastoInput = quizRoot.querySelector("#tempoGasto");
+          if (pontuacaoInput) {
+            pontuacaoInput.value = acertos;
+          }
+          if (tempoGastoInput) {
+            tempoGastoInput.value = Math.floor(
+              (Date.now() - inicioTempo) / 1000
+            );
+          }
+        });
+
+        mostrarPergunta(perguntaAtual);
+      });
+      /*]]>*/
+    </script>
+  </body>
+</html>

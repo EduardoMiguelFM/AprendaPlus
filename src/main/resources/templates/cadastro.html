@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Cadastro - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-lg-10">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <div class="dashboard-hero card mb-0">
+                <div class="card-body">
+                  <div class="badge-level mb-3">
+                    <i class="fas fa-user-plus"></i> Comece sua jornada
+                  </div>
+                  <h2 class="fw-bold text-white mb-3">
+                    Crie sua conta Aprenda+
+                  </h2>
+                  <p class="text-white mb-4">
+                    Acesse cursos, trilhas, desafios e recomendações
+                    personalizadas para acelerar o aprendizado.
+                  </p>
+                  <ul class="list-unstyled text-white-50 small mb-0">
+                    <li>
+                      <i class="fas fa-check-circle text-success"></i> Trilhas
+                      exclusivas por área
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle text-success"></i> IA
+                      indicando o que estudar
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle text-success"></i>
+                      Gamificação com pontos e troféus
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="card shadow border-0">
+                <div class="card-body p-5">
+                  <h2 class="card-title text-center mb-4">
+                    <i class="fas fa-user-plus text-primary"></i> Cadastre-se
+                  </h2>
+
+                  <div
+                    th:if="${erro}"
+                    class="alert alert-danger alert-dismissible fade show"
+                  >
+                    <span th:text="${erro}"></span>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="alert"
+                    ></button>
+                  </div>
+                  <div
+                    th:if="${sucesso}"
+                    class="alert alert-success alert-dismissible fade show"
+                  >
+                    <span th:text="${sucesso}"></span>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="alert"
+                    ></button>
+                  </div>
+
+                  <form
+                    th:action="@{/cadastro}"
+                    th:object="${requisicao}"
+                    method="post"
+                  >
+                    <div class="mb-3">
+                      <label for="nome" class="form-label">Nome completo</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nome"
+                        th:field="*{nome}"
+                        placeholder="Seu nome completo"
+                        required
+                        autofocus
+                      />
+                      <div
+                        th:if="${#fields.hasErrors('nome')}"
+                        class="text-danger small"
+                      >
+                        <span th:errors="*{nome}"></span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        th:field="*{email}"
+                        placeholder="seu@email.com"
+                        required
+                      />
+                      <div
+                        th:if="${#fields.hasErrors('email')}"
+                        class="text-danger small"
+                      >
+                        <span th:errors="*{email}"></span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="senha" class="form-label">Senha</label>
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="senha"
+                        th:field="*{senha}"
+                        placeholder="Mínimo 6 caracteres"
+                        required
+                      />
+                      <div
+                        th:if="${#fields.hasErrors('senha')}"
+                        class="text-danger small"
+                      >
+                        <span th:errors="*{senha}"></span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="confirmarSenha" class="form-label"
+                        >Confirmar senha</label
+                      >
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="confirmarSenha"
+                        th:field="*{confirmarSenha}"
+                        placeholder="Digite a senha novamente"
+                        required
+                      />
+                      <div
+                        th:if="${#fields.hasErrors('confirmarSenha')}"
+                        class="text-danger small"
+                      >
+                        <span th:errors="*{confirmarSenha}"></span>
+                      </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus"></i> Cadastrar
+                      </button>
+                    </div>
+
+                    <input
+                      type="hidden"
+                      th:name="${_csrf.parameterName}"
+                      th:value="${_csrf.token}"
+                    />
+                  </form>
+
+                  <hr class="my-4" />
+
+                  <div class="text-center">
+                    <p class="mb-2">Já tem uma conta?</p>
+                    <a href="/login" class="btn btn-outline-primary"
+                      >Fazer login</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Detalhes do Desafio - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <div class="mb-4">
+        <a href="/desafios" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-start mb-4">
+            <div class="me-3">
+              <h1
+                class="display-1"
+                th:text="${desafio.icone != null ? desafio.icone : '🧠'}"
+              >
+                🧠
+              </h1>
+            </div>
+            <div class="flex-grow-1">
+              <h2 class="card-title" th:text="${desafio.titulo}">
+                Quiz - Vendas
+              </h2>
+              <p class="text-muted" th:text="${desafio.descricao}">
+                Descrição do desafio...
+              </p>
+              <div class="mb-3">
+                <span class="badge bg-warning text-dark fs-6">
+                  <i class="fas fa-trophy"></i>
+                  <span th:text="${desafio.pontos}">200</span> pontos
+                </span>
+                <span class="badge bg-info" th:text="${desafio.dificuldade}"
+                  >Fácil</span
+                >
+                <span class="badge bg-primary" th:text="${desafio.area}"
+                  >Área</span
+                >
+                <span class="badge bg-success" th:text="${desafio.nivel}"
+                  >Nível</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5 class="card-title">Tipo</h5>
+                  <p class="card-text" th:text="${desafio.tipo}">Quiz</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5 class="card-title">Perguntas</h5>
+                  <p
+                    class="card-text"
+                    th:text="${perguntas != null ? perguntas.size() : 0}"
+                  >
+                    3
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5 class="card-title">Pontos</h5>
+                  <p class="card-text text-warning" th:text="${desafio.pontos}">
+                    200
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2" sec:authorize="isAuthenticated()">
+            <a
+              th:href="@{/desafios/{id}/quiz(id=${desafio.id})}"
+              class="btn btn-primary btn-lg"
+            >
+              <i class="fas fa-play"></i> Iniciar Desafio
+            </a>
+          </div>
+          <div sec:authorize="!isAuthenticated()" class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <a href="/login" class="alert-link">Faça login</a> para iniciar este
+            desafio.
+          </div>
+        </div>
+      </div>
+
+      <!-- Informações sobre Pontos -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle"></i> Como funciona?
+          </h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled">
+            <li class="mb-2">
+              <i class="fas fa-check text-success"></i>
+              <strong>80%+ de acerto:</strong> Ganhe 100% dos pontos (<span
+                th:text="${desafio.pontos}"
+                >200</span
+              >
+              pontos)
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-warning"></i>
+              <strong>60-79% de acerto:</strong> Ganhe 70% dos pontos (<span
+                th:text="${#numbers.formatDecimal(desafio.pontos * 0.7, 0, 0)}"
+                >140</span
+              >
+              pontos)
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-info"></i>
+              <strong>40-59% de acerto:</strong> Ganhe 50% dos pontos (<span
+                th:text="${#numbers.formatDecimal(desafio.pontos * 0.5, 0, 0)}"
+                >100</span
+              >
+              pontos)
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-secondary"></i>
+              <strong>Menos de 40%:</strong> Ganhe 30% dos pontos (<span
+                th:text="${#numbers.formatDecimal(desafio.pontos * 0.3, 0, 0)}"
+                >60</span
+              >
+              pontos)
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-trophy text-warning"></i>
+              <strong>100% de acerto:</strong> Conquiste o troféu "Perfeito"!
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

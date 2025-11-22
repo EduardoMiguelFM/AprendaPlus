@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Trilhas - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <div class="dashboard-hero card mb-4">
+        <div class="card-body p-4">
+          <div
+            class="d-flex flex-column flex-lg-row justify-content-between gap-3"
+          >
+            <div>
+              <div class="badge-level mb-2">
+                <i class="fas fa-route"></i> Trilhas guiadas
+              </div>
+              <h1 class="fw-bold mb-2">
+                Siga um caminho completo de aprendizado
+              </h1>
+              <p class="mb-0">
+                Combine cursos e desafios em sequência para evoluir por área de
+                forma estruturada.
+              </p>
+            </div>
+            <a
+              href="/cursos"
+              class="btn btn-outline-light align-self-start align-self-lg-center"
+            >
+              <i class="fas fa-book"></i> Ver catálogo completo
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="surface-section mb-4">
+        <div class="card-body p-0">
+          <form method="get" action="/trilhas">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Área</label>
+                <select
+                  name="area"
+                  class="form-select"
+                  th:value="${areaFiltro}"
+                >
+                  <option value="">Todas</option>
+                  <option value="ia">Inteligência Artificial</option>
+                  <option value="dados">Ciência de Dados</option>
+                  <option value="programacao">Programação</option>
+                  <option value="sustentabilidade">Sustentabilidade</option>
+                  <option value="design">Design</option>
+                  <option value="marketing">Marketing Digital</option>
+                  <option value="gestao">Gestão</option>
+                  <option value="vendas">Vendas</option>
+                  <option value="rh">Recursos Humanos</option>
+                  <option value="financas">Finanças</option>
+                  <option value="saude">Saúde</option>
+                  <option value="educacao">Educação</option>
+                </select>
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fas fa-filter"></i> Filtrar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Lista de Trilhas -->
+      <div
+        class="surface-section"
+        th:if="${trilhas != null and !trilhas.empty}"
+      >
+        <div class="row g-4">
+          <div class="col-md-6" th:each="trilha : ${trilhas.content}">
+            <div class="card h-100 shadow-sm border-0">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex gap-3 mb-3">
+                  <div class="display-5" th:text="${trilha.icone}">📚</div>
+                  <div class="flex-grow-1">
+                    <h4 class="mb-1" th:text="${trilha.titulo}">Trilha</h4>
+                    <p class="text-muted mb-2" th:text="${trilha.descricao}">
+                      Desc
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                      <span
+                        class="badge bg-primary bg-opacity-10 text-primary"
+                        th:text="${trilha.area}"
+                        >Área</span
+                      >
+                      <span
+                        class="badge bg-dark text-white"
+                        th:text="${trilha.nivelMinimo}"
+                        >Nível</span
+                      >
+                      <span class="badge bg-success bg-opacity-10 text-success">
+                        <i class="fas fa-book"></i>
+                        <span th:text="${trilha.cursos.size()}">8</span> cursos
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-muted small mb-3">
+                  <i class="fas fa-clock"></i>
+                  <span th:text="${trilha.duracaoTotal}">100 horas</span>
+                </p>
+                <a
+                  th:href="@{/trilhas/{id}(id=${trilha.id})}"
+                  class="btn btn-primary w-100 mt-auto"
+                >
+                  <i class="fas fa-eye"></i> Ver detalhes
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        th:if="${trilhas == null or trilhas.empty}"
+        class="alert alert-info text-center"
+      >
+        <i class="fas fa-info-circle"></i> Nenhuma trilha encontrada.
+      </div>
+
+      <!-- Paginação -->
+      <nav th:if="${totalPaginas > 1}">
+        <ul class="pagination justify-content-center">
+          <li
+            class="page-item"
+            th:classappend="${paginaAtual == 0} ? 'disabled'"
+          >
+            <a
+              class="page-link"
+              th:href="@{/trilhas(pagina=${paginaAtual - 1}, area=${areaFiltro})}"
+              >Anterior</a
+            >
+          </li>
+          <li
+            class="page-item"
+            th:each="pagina : ${#numbers.sequence(0, totalPaginas - 1)}"
+            th:classappend="${pagina == paginaAtual} ? 'active'"
+          >
+            <a
+              class="page-link"
+              th:href="@{/trilhas(pagina=${pagina}, area=${areaFiltro})}"
+              th:text="${pagina + 1}"
+              >1</a
+            >
+          </li>
+          <li
+            class="page-item"
+            th:classappend="${paginaAtual >= totalPaginas - 1} ? 'disabled'"
+          >
+            <a
+              class="page-link"
+              th:href="@{/trilhas(pagina=${paginaAtual + 1}, area=${areaFiltro})}"
+              >Próxima</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </body>
+</html>

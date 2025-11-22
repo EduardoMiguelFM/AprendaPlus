@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Detalhes da Trilha - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <div class="mb-4">
+        <a href="/trilhas" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+      <div class="surface-section card border-0 mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-start mb-4">
+            <div class="me-3">
+              <h1 class="display-1" th:text="${trilha.icone}">📚</h1>
+            </div>
+            <div class="flex-grow-1">
+              <h2 class="card-title" th:text="${trilha.titulo}">
+                Trilha de Data Science
+              </h2>
+              <p class="text-muted" th:text="${trilha.descricao}">
+                Descrição da trilha...
+              </p>
+              <div class="mb-3">
+                <span class="badge bg-primary" th:text="${trilha.area}"
+                  >Área</span
+                >
+                <span class="badge bg-info" th:text="${trilha.nivelMinimo}"
+                  >Nível Mínimo</span
+                >
+                <span class="badge bg-success" th:text="${trilha.duracaoTotal}"
+                  >100 horas</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Progresso -->
+          <div
+            th:if="${progresso != null}"
+            class="mb-4"
+            sec:authorize="isAuthenticated()"
+          >
+            <div class="d-flex justify-content-between mb-2">
+              <span><strong>Progresso da Trilha</strong></span>
+              <span
+                th:text="${#numbers.formatDecimal(progresso.percentualCompleto, 1, 1)} + '%'"
+                >0%</span
+              >
+            </div>
+            <div class="progress" style="height: 30px">
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                th:style="'width: ' + ${#numbers.formatDecimal(progresso.percentualCompleto, 1, 1)} + '%;'"
+                th:text="${progresso.cursosCompletos} + ' / ' + ${progresso.totalCursos} + ' cursos'"
+              >
+                0 / 8 cursos
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2" sec:authorize="isAuthenticated()">
+            <form
+              th:action="@{/trilhas/{id}/inscrever(id=${trilha.id})}"
+              method="post"
+            >
+              <button type="submit" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-plus"></i> Inscrever-se na Trilha
+              </button>
+
+              <input
+                type="hidden"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}"
+              />
+            </form>
+          </div>
+          <div sec:authorize="!isAuthenticated()" class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <a href="/login" class="alert-link">Faça login</a> para se inscrever
+            nesta trilha.
+          </div>
+        </div>
+      </div>
+
+      <!-- Cursos da Trilha -->
+      <div class="surface-section card border-0">
+        <div class="card-header bg-white border-0">
+          <h5 class="mb-0">
+            <i class="fas fa-book"></i> Cursos da Trilha (<span
+              th:text="${trilha.cursos.size()}"
+              >8</span
+            >)
+          </h5>
+        </div>
+        <div class="card-body">
+          <div
+            class="row"
+            th:if="${trilha.cursos != null and !trilha.cursos.empty}"
+          >
+            <div
+              class="col-md-6 mb-3"
+              th:each="curso, iterStat : ${trilha.cursos}"
+            >
+              <div class="card h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-start">
+                    <div class="me-3">
+                      <h3 th:text="${curso.icone}">📚</h3>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="card-title" th:text="${curso.titulo}">
+                        Título do Curso
+                      </h6>
+                      <p
+                        class="card-text small text-muted"
+                        th:text="${#strings.abbreviate(curso.descricao, 80)}"
+                      >
+                        Descrição...
+                      </p>
+                      <div class="mb-2">
+                        <span
+                          class="badge bg-secondary"
+                          th:text="${curso.nivel}"
+                          >Nível</span
+                        >
+                        <span class="badge bg-info" th:text="${curso.duracao}"
+                          >Duração</span
+                        >
+                      </div>
+                      <div class="text-warning mb-2">
+                        <i class="fas fa-star"></i>
+                        <span th:text="${curso.avaliacao}">4.5</span>
+                      </div>
+                      <a
+                        th:href="@{/cursos/{id}(id=${curso.id})}"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        Ver Curso
+                      </a>
+                    </div>
+                    <div class="text-muted">
+                      <span th:text="${iterStat.index + 1}">1</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            th:if="${trilha.cursos == null or trilha.cursos.empty}"
+            class="alert alert-info"
+          >
+            <i class="fas fa-info-circle"></i> Esta trilha ainda não possui
+            cursos cadastrados.
+          </div>
+        </div>
+      </div>
+
+      <!-- Desafios da Trilha -->
+      <div class="surface-section card border-0 mt-4">
+        <div class="card-header bg-white border-0">
+          <h5 class="mb-0">
+            <i class="fas fa-gamepad"></i> Desafios Conectados (<span
+              th:text="${trilha.desafios != null ? trilha.desafios.size() : 0}"
+              >0</span
+            >)
+          </h5>
+        </div>
+        <div class="card-body">
+          <div
+            class="row g-3"
+            th:if="${trilha.desafios != null and !trilha.desafios.empty}"
+          >
+            <div class="col-md-6" th:each="desafio : ${trilha.desafios}">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                  <div class="d-flex justify-content-between mb-2">
+                    <h6 class="mb-0">
+                      <span class="me-2" th:text="${desafio.icone}">🧠</span>
+                      <span th:text="${desafio.titulo}">Desafio</span>
+                    </h6>
+                    <span
+                      class="badge bg-primary bg-opacity-10 text-primary"
+                      th:text="${desafio.nivel}"
+                      >Nível</span
+                    >
+                  </div>
+                  <p
+                    class="text-muted small flex-grow-1"
+                    th:text="${#strings.abbreviate(desafio.descricao, 120)}"
+                  >
+                    Descricao
+                  </p>
+                  <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge bg-warning text-dark"
+                      ><i class="fas fa-star"></i>
+                      <span th:text="${desafio.pontos}">50</span> pts</span
+                    >
+                    <span
+                      class="badge bg-dark text-white"
+                      th:text="${desafio.tipo}"
+                      >Quiz</span
+                    >
+                  </div>
+                  <a
+                    th:href="@{/desafios/{id}/quiz(id=${desafio.id})}"
+                    class="btn btn-outline-primary btn-sm mt-auto"
+                  >
+                    Fazer desafio
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            th:if="${trilha.desafios == null or trilha.desafios.empty}"
+            class="alert alert-info mb-0"
+          >
+            <i class="fas fa-info-circle"></i> Esta trilha ainda não possui
+            desafios vinculados.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

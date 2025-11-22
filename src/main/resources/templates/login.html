@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::conteudo}, 'Login - Aprenda+')}"
+>
+  <body>
+    <div th:fragment="conteudo">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-lg-10">
+          <div class="row g-4">
+            <div class="col-lg-5">
+              <div class="dashboard-hero card mb-0">
+                <div class="card-body">
+                  <div class="badge-level mb-3">
+                    <i class="fas fa-sign-in-alt"></i> Bem-vindo de volta
+                  </div>
+                  <h2 class="fw-bold text-white mb-3">
+                    Entre para continuar sua jornada
+                  </h2>
+                  <p class="text-white mb-4">
+                    Acesse sua conta para retomar cursos, desafios e ver
+                    recomendações personalizadas.
+                  </p>
+                  <ul class="list-unstyled text-white-50 small mb-0">
+                    <li>
+                      <i class="fas fa-check-circle text-success"></i> Continue
+                      exatamente de onde parou
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle text-success"></i> Ganhe
+                      pontos e desbloqueie troféus
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle text-success"></i> Chat IA
+                      para sugestão de estudos
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="card shadow border-0">
+                <div class="card-body p-5">
+                  <h2 class="card-title text-center mb-4">
+                    <i class="fas fa-sign-in-alt text-primary"></i> Entrar
+                  </h2>
+
+                  <div
+                    th:if="${erro}"
+                    class="alert alert-danger alert-dismissible fade show"
+                  >
+                    <span th:text="${erro}"></span>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="alert"
+                    ></button>
+                  </div>
+                  <div
+                    th:if="${sucesso}"
+                    class="alert alert-success alert-dismissible fade show"
+                  >
+                    <span th:text="${sucesso}"></span>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="alert"
+                    ></button>
+                  </div>
+
+                  <form
+                    th:action="@{/login}"
+                    th:object="${requisicao}"
+                    method="post"
+                  >
+                    <div class="mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        th:field="*{email}"
+                        placeholder="seu@email.com"
+                        required
+                        autofocus
+                      />
+                      <div
+                        th:if="${#fields.hasErrors('email')}"
+                        class="text-danger small"
+                      >
+                        <span th:errors="*{email}"></span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="senha" class="form-label">Senha</label>
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="senha"
+                        th:field="*{senha}"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <div
+                        th:if="${#fields.hasErrors('senha')}"
+                        class="text-danger small"
+                      >
+                        <span th:errors="*{senha}"></span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="lembrar"
+                        name="remember-me"
+                      />
+                      <label class="form-check-label" for="lembrar"
+                        >Lembrar-me</label
+                      >
+                    </div>
+
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                      </button>
+                    </div>
+
+                    <input
+                      type="hidden"
+                      th:name="${_csrf.parameterName}"
+                      th:value="${_csrf.token}"
+                    />
+                  </form>
+
+                  <hr class="my-4" />
+
+                  <div class="text-center">
+                    <p class="mb-2">Não tem uma conta?</p>
+                    <a href="/cadastro" class="btn btn-outline-primary"
+                      >Cadastrar-se</a
+                    >
+                  </div>
+
+                  <div class="text-center mt-3">
+                    <a
+                      href="/api/auth/forgot-password"
+                      class="text-muted small"
+                    >
+                      Esqueceu sua senha?
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

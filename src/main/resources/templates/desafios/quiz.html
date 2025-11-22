@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Quiz - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo" data-page="quiz">
+      <div class="mb-4">
+        <a href="/desafios" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+      <style>
+        .quiz-wrapper {
+          border-radius: 18px;
+          overflow: hidden;
+        }
+        .quiz-header {
+          background: linear-gradient(135deg, #4f46e5, #7c3aed);
+          border-radius: 16px;
+          padding: 1.5rem;
+          color: #fff;
+        }
+        .quiz-step {
+          width: 90px;
+          height: 90px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.12);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+        }
+        .btn-quiz-next {
+          background: linear-gradient(135deg, #2563eb, #0ea5e9);
+          border: none;
+          color: #fff;
+          box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+        .quiz-question {
+          border: 1px solid rgba(79, 70, 229, 0.15);
+          border-radius: 16px;
+        }
+        .quiz-option input:checked + span {
+          color: #2563eb;
+          font-weight: 600;
+        }
+      </style>
+
+      <div class="quiz-wrapper card border-0 shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          <div
+            class="quiz-header mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3"
+          >
+            <div>
+              <span class="badge bg-light text-primary mb-2">Desafio</span>
+              <h2 class="h4 mb-1" th:text="${desafio.titulo}">Quiz - Vendas</h2>
+              <p class="mb-0 text-white-50" th:text="${desafio.descricao}">
+                Descrição
+              </p>
+            </div>
+            <div class="quiz-step text-center">
+              <div class="fs-4" id="indicadorPergunta">1</div>
+              <small
+                class="text-uppercase text-white-50"
+                style="font-size: 0.7rem"
+                >/ <span th:text="${perguntas.size()}">5</span></small
+              >
+              <small class="text-white-50">Questão</small>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span
+                class="fw-semibold text-muted text-uppercase"
+                style="letter-spacing: 0.08em"
+                >Progresso</span
+              >
+              <span id="progressoTexto" class="fw-semibold text-primary"
+                >1 / <span th:text="${perguntas.size()}">3</span></span
+              >
+            </div>
+            <div
+              class="progress"
+              style="
+                height: 16px;
+                border-radius: 999px;
+                background-color: #ede9fe;
+              "
+            >
+              <div
+                class="progress-bar"
+                id="progressoBar"
+                role="progressbar"
+                style="
+                  width: 0%;
+                  background: linear-gradient(90deg, #7c3aed, #0ea5e9);
+                "
+              ></div>
+            </div>
+          </div>
+
+          <div
+            th:if="${perguntas == null or perguntas.isEmpty()}"
+            class="alert alert-warning mb-0"
+          >
+            Não encontramos perguntas cadastradas para este desafio ainda.
+            Experimente outro desafio enquanto preparamos mais conteúdos.
+          </div>
+
+          <form
+            th:if="${perguntas != null and !perguntas.isEmpty()}"
+            id="quizForm"
+            th:action="@{/desafios/{id}/completar(id=${desafio.id})}"
+            method="post"
+          >
+            <div id="perguntasContainer">
+              <div
+                class="pergunta-item quiz-question mb-4 p-3 p-md-4"
+                th:each="pergunta, iterStat : ${perguntas}"
+                th:attr="data-index=${iterStat.index},data-correto=${pergunta.indiceCorreto}"
+                th:style="${iterStat.index > 0} ? 'display: none;' : ''"
+              >
+                <p class="text-muted small text-uppercase mb-1">
+                  Pergunta <span th:text="${iterStat.index + 1}">1</span>
+                </p>
+                <h5 class="mb-3" th:text="${pergunta.pergunta}">Pergunta?</h5>
+                <div class="list-group">
+                  <label
+                    class="list-group-item list-group-item-action quiz-option d-flex align-items-center"
+                    th:each="opcao, opcaoStat : ${pergunta.opcoes}"
+                  >
+                    <input
+                      type="radio"
+                      th:name="${'resposta[' + iterStat.index + ']'}"
+                      th:value="${opcaoStat.index}"
+                      th:attr="data-pergunta=${iterStat.index}"
+                      class="form-check-input me-2"
+                    />
+                    <span th:text="${opcao}">Opção</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <input type="hidden" id="pontuacao" name="pontuacao" value="0" />
+            <input
+              type="hidden"
+              id="totalPerguntas"
+              name="totalPerguntas"
+              th:value="${perguntas.size()}"
+            />
+            <input type="hidden" id="tempoGasto" name="tempoGasto" value="0" />
+            <input
+              type="hidden"
+              th:name="${_csrf.parameterName}"
+              th:value="${_csrf.token}"
+            />
+
+            <div
+              class="mt-4 d-flex flex-column flex-md-row gap-2 justify-content-between"
+            >
+              <button
+                type="button"
+                class="btn btn-outline-secondary w-100 w-md-auto"
+                id="btnAnterior"
+                style="display: none"
+              >
+                <i class="fas fa-arrow-left"></i> Anterior
+              </button>
+              <button
+                type="button"
+                class="btn btn-quiz-next ms-md-auto w-100 w-md-auto"
+                id="btnProximo"
+              >
+                Próxima <i class="fas fa-arrow-right ms-2"></i>
+              </button>
+              <button
+                type="submit"
+                class="btn btn-success w-100 w-md-auto"
+                id="btnFinalizar"
+                style="display: none"
+              >
+                <i class="fas fa-check"></i> Finalizar
+              </button>
+            </div>
+
+            <div id="quizAviso" class="alert alert-warning mt-3 d-none"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

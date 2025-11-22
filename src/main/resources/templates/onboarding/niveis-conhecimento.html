@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::#conteudo}, 'Níveis de Conhecimento - Aprenda+')}"
+>
+  <body>
+    <div id="conteudo">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <div class="card shadow">
+            <div class="card-body p-5">
+              <h2 class="card-title text-center mb-4">
+                <i class="fas fa-graduation-cap text-primary"></i> Qual seu
+                nível de conhecimento?
+              </h2>
+              <p class="text-center text-muted mb-4">
+                Para cada área selecionada, informe seu nível atual de
+                conhecimento. Isso nos ajudará a sugerir cursos adequados para
+                você!
+              </p>
+
+              <div
+                th:if="${erro}"
+                class="alert alert-danger alert-dismissible fade show"
+              >
+                <span th:text="${erro}"></span>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                ></button>
+              </div>
+
+              <form
+                th:action="@{/onboarding/niveis-conhecimento}"
+                method="post"
+              >
+                <input
+                  type="hidden"
+                  th:each="area : ${areasSelecionadas}"
+                  th:name="areasSelecionadas"
+                  th:value="${area}"
+                />
+
+                <div th:each="entry : ${areas}" class="mb-4">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">
+                        <span th:text="${entry.value}"></span>
+                      </h5>
+                      <div class="btn-group" role="group">
+                        <input
+                          type="radio"
+                          class="btn-check"
+                          th:id="${entry.key + '_iniciante'}"
+                          th:name="${'niveis[' + entry.key + ']'}"
+                          th:value="Iniciante"
+                          checked
+                        />
+                        <label
+                          class="btn btn-outline-success"
+                          th:for="${entry.key + '_iniciante'}"
+                        >
+                          <i class="fas fa-seedling"></i> Iniciante
+                        </label>
+
+                        <input
+                          type="radio"
+                          class="btn-check"
+                          th:id="${entry.key + '_intermediario'}"
+                          th:name="${'niveis[' + entry.key + ']'}"
+                          th:value="Intermediário"
+                        />
+                        <label
+                          class="btn btn-outline-primary"
+                          th:for="${entry.key + '_intermediario'}"
+                        >
+                          <i class="fas fa-book"></i> Intermediário
+                        </label>
+
+                        <input
+                          type="radio"
+                          class="btn-check"
+                          th:id="${entry.key + '_avancado'}"
+                          th:name="${'niveis[' + entry.key + ']'}"
+                          th:value="Avançado"
+                        />
+                        <label
+                          class="btn btn-outline-danger"
+                          th:for="${entry.key + '_avancado'}"
+                        >
+                          <i class="fas fa-rocket"></i> Avançado
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    Continuar
+                  </button>
+                </div>
+
+                <input
+                  type="hidden"
+                  th:name="${_csrf.parameterName}"
+                  th:value="${_csrf.token}"
+                />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

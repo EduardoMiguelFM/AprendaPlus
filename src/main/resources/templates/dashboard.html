@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  th:replace="~{fragments/layout :: layout(~{::conteudo}, 'Dashboard - Aprenda+')}"
+>
+  <body>
+    <div th:fragment="conteudo">
+      <!-- Hero -->
+      <div th:if="${stats != null}" class="dashboard-hero card mb-4 shadow-lg">
+        <div class="card-body p-4">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <span
+                  class="badge-level"
+                  th:text="${stats.nivelInfo != null ? stats.nivelInfo.nivelAtual.icone + ' ' + stats.nivelInfo.nivelAtual.nome : 'Explorador'}"
+                  >🥉 Bronze</span
+                >
+                <span class="opacity-75">Progresso da jornada</span>
+              </div>
+              <h1 class="fw-bold mb-2 text-white">
+                Olá, <span th:text="${usuario.nome}">Usuário</span> 👋
+              </h1>
+              <p class="mb-4 text-white">
+                Continue sua jornada de aprendizado. Estamos acompanhando cada
+                conquista!
+              </p>
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <div
+                    class="bg-white bg-opacity-20 rounded-4 p-3 h-100 hero-info-box"
+                  >
+                    <p class="mb-1 text-uppercase small opacity-75">Pontos</p>
+                    <h2 class="fw-bold mb-0" th:text="${stats.pontos}">0</h2>
+                  </div>
+                </div>
+                <div class="col-sm-6" th:if="${stats.nivelInfo != null}">
+                  <div
+                    class="bg-white bg-opacity-20 rounded-4 p-3 h-100 hero-info-box"
+                  >
+                    <p class="mb-1 text-uppercase small opacity-75">
+                      Próximo nível
+                    </p>
+                    <h5
+                      class="mb-0"
+                      th:text="${stats.nivelInfo.proximoNivel != null ? stats.nivelInfo.proximoNivel.icone + ' ' + stats.nivelInfo.proximoNivel.nome : 'Nível máximo!'}"
+                    >
+                      🥈 Prata
+                    </h5>
+                    <small th:if="${stats.nivelInfo.proximoNivel != null}">
+                      Faltam
+                      <strong th:text="${stats.nivelInfo.pontosParaProximo}"
+                        >100</strong
+                      >
+                      pts
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 text-center text-lg-end">
+              <div
+                class="nivel-badge mb-3"
+                th:if="${stats.nivelInfo != null}"
+                th:style="'background: linear-gradient(135deg, ' + ${stats.nivelInfo.nivelAtual.cor} + ' 0%, ' + ${stats.nivelInfo.nivelAtual.cor} + 'CC 100%);'"
+                style="
+                  width: 140px;
+                  height: 140px;
+                  border-radius: 50%;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                  animation: pulse 2s infinite;
+                "
+              >
+                <div class="text-white text-center">
+                  <div
+                    class="display-4"
+                    th:text="${stats.nivelInfo.nivelAtual.icone}"
+                  >
+                    🥉
+                  </div>
+                  <div
+                    class="fw-bold"
+                    th:text="${stats.nivelInfo.nivelAtual.nome}"
+                  >
+                    Bronze
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div
+                  class="progress"
+                  style="
+                    height: 14px;
+                    border-radius: 20px;
+                    background: rgba(255, 255, 255, 0.2);
+                  "
+                >
+                  <div
+                    class="progress-bar"
+                    th:style="'width: ' + ${stats.nivelInfo != null ? stats.nivelInfo.progresso : 0} + '%; background: #fcd34d;'"
+                    th:text="${stats.nivelInfo != null ? stats.nivelInfo.progresso + '%' : '0%'}"
+                  >
+                    42%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${stats == null}" class="dashboard-hero card mb-4 shadow-lg">
+        <div class="card-body p-4">
+          <div
+            class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+          >
+            <div>
+              <h1 class="fw-bold mb-2">Bem-vindo ao Aprenda+</h1>
+              <p class="mb-0">
+                Finalize seu cadastro para desbloquear a experiência completa.
+              </p>
+            </div>
+            <div class="badge-level bg-white text-dark">Novo Explorador</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="surface-section mb-4" th:if="${stats != null}">
+        <div class="row g-3">
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card d-flex align-items-center">
+            <div class="metric-icon bg-warning bg-opacity-25 text-warning">
+              <i class="fas fa-star"></i>
+            </div>
+            <div>
+              <p class="text-muted mb-1">Pontos</p>
+              <h3 class="mb-0" th:text="${stats.pontos}">1500</h3>
+              <small th:if="${stats.nivelInfo != null}">
+                Nível
+                <span th:text="${stats.nivelInfo.nivelAtual.nome}">Bronze</span>
+              </small>
+            </div>
+          </div>
+        </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card d-flex align-items-center">
+            <div class="metric-icon bg-primary text-white">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div>
+              <p class="text-muted mb-1">Cursos em andamento</p>
+              <h3 class="mb-0" th:text="${stats.cursosEmAndamento}">2</h3>
+              <small>Continue o ritmo!</small>
+            </div>
+          </div>
+        </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card d-flex align-items-center">
+            <div class="metric-icon bg-success text-white">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+              <p class="text-muted mb-1">Cursos concluídos</p>
+              <h3 class="mb-0" th:text="${stats.cursosConcluidos}">1</h3>
+              <small>Parabéns pelas conquistas</small>
+            </div>
+          </div>
+        </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="metric-card d-flex align-items-center">
+            <div class="metric-icon bg-danger text-white">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div>
+              <p class="text-muted mb-1">Desafios completos</p>
+              <h3 class="mb-0" th:text="${stats.desafiosCompletos}">5</h3>
+              <small>Siga desbloqueando troféus</small>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Progresso Geral -->
+      <div class="surface-section card progress-card mb-4" th:if="${stats != null}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="mb-1 section-title">
+                <i class="fas fa-chart-line text-primary"></i> Progresso geral
+              </h5>
+              <p class="text-muted mb-0">
+                A média do seu avanço em todos os cursos
+              </p>
+            </div>
+            <span
+              class="badge bg-primary bg-opacity-10 text-primary fs-6 px-3"
+              th:text="${stats.progressoGeral + '%'}"
+              >42%</span
+            >
+          </div>
+          <div class="progress" style="height: 24px">
+            <div
+              class="progress-bar progress-bar-striped progress-bar-animated"
+              role="progressbar"
+              th:style="'width: ' + ${stats.progressoGeral} + '%;'"
+              th:attr="aria-valuenow=${stats.progressoGeral}"
+              th:text="${stats.progressoGeral} + '%'"
+            >
+              42%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assistente IA -->
+      <div class="surface-section mb-4">
+        <div class="ia-chat-card mb-0 w-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="display-5">🤖</div>
+              <div>
+                <h4 class="mb-1 text-white">Assistente IA do Aprenda+</h4>
+                <p class="mb-0 text-white-50">
+                  Pergunte sobre cursos, desafios e peça dicas personalizadas
+                </p>
+              </div>
+            </div>
+            <div
+              id="chatContainer"
+              class="bg-white bg-opacity-10 rounded-4 p-3 mb-3"
+              style="max-height: 320px; overflow-y: auto"
+            >
+              <div class="alert alert-info mb-2">
+                <i class="fas fa-info-circle"></i> Como posso ajudar hoje?
+              </div>
+            </div>
+            <div class="input-group ia-chat-input">
+
+              <input
+                type="text"
+                class="form-control"
+                id="chatInput"
+                placeholder="Pergunte algo sobre cursos, aprendizado, etc..."
+              />
+              <button
+                class="btn btn-warning text-dark"
+                type="button"
+                id="chatSendBtn"
+              >
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="surface-section mb-4">
+        <div class="row g-4">
+          <!-- Cursos Sugeridos -->
+          <div
+            class="col-lg-8"
+            th:if="${cursosSugeridos != null and !cursosSugeridos.empty}"
+          >
+            <section class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <h3 class="section-title mb-0">
+                  <i class="fas fa-magic text-primary"></i> Cursos sugeridos
+                </h3>
+                <a href="/cursos" class="btn btn-outline-primary btn-sm"
+                  >Explorar tudo</a
+                >
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6" th:each="curso : ${cursosSugeridos}">
+                  <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="fs-4" th:text="${curso.icone}">📚</div>
+                        <h5 class="mb-0" th:text="${curso.titulo}">Título</h5>
+                      </div>
+                      <p
+                        class="text-muted small flex-grow-1"
+                        th:text="${#strings.abbreviate(curso.descricao, 110)}"
+                      >
+                        descrição
+                      </p>
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <span
+                          class="badge bg-primary bg-opacity-10 text-primary"
+                          th:text="${curso.area}"
+                          >Área</span
+                        >
+                        <a
+                          th:href="@{/cursos/{id}(id=${curso.id})}"
+                          class="btn btn-sm btn-primary"
+                        >
+                          Ver Curso
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </section>
+          </div>
+
+          <!-- Próximos passos -->
+          <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h4 class="section-title mb-3">
+                <i class="fas fa-route text-success"></i> Próximos passos
+              </h4>
+              <div class="journey-step mb-3">
+                <h6 class="mb-1">Complete um desafio hoje</h6>
+                <p class="text-muted small mb-0">
+                  Ganhe pontos extras e desbloqueie troféus
+                </p>
+              </div>
+              <div class="journey-step mb-3">
+                <h6 class="mb-1">Avance 10% em um curso</h6>
+                <p class="text-muted small mb-0">
+                  Cada milestone rende recompensas agora
+                </p>
+              </div>
+              <div class="journey-step">
+                <h6 class="mb-1">Atualize suas áreas de interesse</h6>
+                <p class="text-muted small mb-0">
+                  Receba recomendações ainda mais precisas
+                </p>
+            </div>
+          </div>
+        </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meus Cursos em Andamento -->
+      <section
+        th:if="${cursosEmAndamento != null and !cursosEmAndamento.empty}"
+        class="surface-section mb-4"
+      >
+        <div class="card-body p-0">
+            <h3 class="section-title mb-3">
+              <i class="fas fa-book-open text-info"></i> Meus cursos em
+              andamento
+            </h3>
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Curso</th>
+                    <th>Área</th>
+                    <th style="width: 30%">Progresso</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="uc : ${cursosEmAndamento}">
+                    <td>
+                      <span class="me-2" th:text="${uc.curso.icone}">📚</span>
+                      <strong th:text="${uc.curso.titulo}">Título</strong>
+                    </td>
+                    <td>
+                      <span
+                        class="badge bg-primary bg-opacity-10 text-primary"
+                        th:text="${uc.curso.area}"
+                        >Área</span
+                      >
+                    </td>
+                    <td>
+                      <div
+                        class="progress"
+                        style="height: 12px; border-radius: 999px"
+                      >
+                        <div
+                          class="progress-bar bg-success"
+                          th:style="'width: ' + ${uc.progresso} + '%;'"
+                          th:text="${uc.progresso} + '%'"
+                        >
+                          45%
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <a
+                        th:href="@{/cursos/{id}(id=${uc.curso.id})}"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        Continuar
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troféus -->
+      <section
+        th:if="${stats.trofes != null and !stats.trofes.empty}"
+        class="surface-section mb-4"
+      >
+        <h3 class="mb-3">
+          <i class="fas fa-trophy text-warning"></i> Meus Troféus
+        </h3>
+        <div class="row">
+          <div class="col-md-3 mb-3" th:each="trofeu : ${stats.trofes}">
+            <div class="card text-center">
+              <div class="card-body">
+                <h1 class="display-4" th:text="${trofeu.icone}">🏆</h1>
+                <h5 class="card-title" th:text="${trofeu.nome}">Troféu</h5>
+                <p
+                  class="card-text small text-muted"
+                  th:text="${trofeu.descricao}"
+                >
+                  Descrição
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ranking -->
+      <div class="surface-section card border-0 mb-4" th:if="${stats.ranking != null}">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-medal"></i> Ranking</h5>
+        </div>
+        <div class="card-body text-center">
+          <h2
+            class="text-primary"
+            th:text="${stats.ranking.posicao} + 'º lugar'"
+          >
+            150º lugar
+          </h2>
+          <p class="text-muted">
+            Entre <span th:text="${stats.ranking.total}">1000</span> usuários
+          </p>
+        </div>
+      </div>
+
+      <!-- Ações Rápidas -->
+      <div class="surface-section card border-0">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-bolt"></i> Ações Rápidas</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-2">
+              <a href="/cursos" class="btn btn-primary w-100">
+                <i class="fas fa-book"></i> Explorar Cursos
+              </a>
+            </div>
+            <div class="col-md-4 mb-2">
+              <a href="/desafios" class="btn btn-success w-100">
+                <i class="fas fa-gamepad"></i> Fazer Desafios
+              </a>
+            </div>
+            <div class="col-md-4 mb-2">
+              <a href="/trilhas" class="btn btn-info w-100">
+                <i class="fas fa-route"></i> Ver Trilhas
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

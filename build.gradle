@@ -1,0 +1,68 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.7'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'br.com.fiap'
+version = '0.0.1-SNAPSHOT'
+description = 'Aprenda+, Aplicação focado em cursos com ideia inovadora'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+	// Spring Boot Starters
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	
+	// Spring AI - Inteligência Artificial Generativa
+	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M4'
+	
+	// Banco de Dados PostgreSQL
+	runtimeOnly 'org.postgresql:postgresql'
+	
+	// Flyway - Migração de Banco de Dados
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	
+	// Cache - Caffeine (in-memory cache)
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+	
+	// Swagger/OpenAPI - Documentação
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+	
+	// Lombok - Reduz boilerplate code
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	// Thymeleaf Security
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	
+	// Jackson para serialização JSON
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	
+	// Testes
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'com.h2database:h2' // Banco em memória para testes
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
