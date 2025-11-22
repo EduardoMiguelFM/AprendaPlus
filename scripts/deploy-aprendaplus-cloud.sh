@@ -67,60 +67,86 @@ ok_step "Resource group pronto"
 
 # 2. PostgreSQL
 info_step "[2/9] PostgreSQL Flexible Server"
-az postgres flexible-server create \
-  --resource-group "$RESOURCE_GROUP" \
-  --name "$POSTGRES_SERVER" \
-  --location "$LOCATION" \
-  --admin-user "$POSTGRES_USER" \
-  --admin-password "$POSTGRES_PASSWORD" \
-  --sku-name Standard_B1ms \
-  --tier Burstable \
-  --storage-size 32 \
-  --version 16 \
-  --public-access 0.0.0.0 \
-  --output none
-ok_step "PostgreSQL criado"
+if az postgres flexible-server show --resource-group "$RESOURCE_GROUP" --name "$POSTGRES_SERVER" >/dev/null 2>&1; then
+  ok_step "PostgreSQL reutilizado"
+else
+  az postgres flexible-server create \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$POSTGRES_SERVER" \
+    --location "$LOCATION" \
+    --admin-user "$POSTGRES_USER" \
+    --admin-password "$POSTGRES_PASSWORD" \
+    --sku-name Standard_B1ms \
+    --tier Burstable \
+    --storage-size 32 \
+    --version 16 \
+    --public-access 0.0.0.0 \
+    --output none
+  ok_step "PostgreSQL criado"
+fi
 
 # 3. Database
 info_step "[3/9] Database"
-az postgres flexible-server db create \
+if az postgres flexible-server db show \
   --resource-group "$RESOURCE_GROUP" \
   --server-name "$POSTGRES_SERVER" \
-  --database-name "$POSTGRES_DB" \
-  --output none
-ok_step "Database criada"
+  --database-name "$POSTGRES_DB" >/dev/null 2>&1; then
+  ok_step "Database reutilizada"
+else
+  az postgres flexible-server db create \
+    --resource-group "$RESOURCE_GROUP" \
+    --server-name "$POSTGRES_SERVER" \
+    --database-name "$POSTGRES_DB" \
+    --output none
+  ok_step "Database criada"
+fi
 
 # 4. Firewall
 info_step "[4/9] Firewall"
-az postgres flexible-server firewall-rule create \
+if az postgres flexible-server firewall-rule show \
   --resource-group "$RESOURCE_GROUP" \
   --name "$POSTGRES_SERVER" \
-  --rule-name AllowAzureServices \
-  --start-ip-address 0.0.0.0 \
-  --end-ip-address 0.0.0.0 \
-  --output none
-ok_step "Firewall liberado para Azure"
+  --rule-name AllowAzureServices >/dev/null 2>&1; then
+  ok_step "Firewall já configurado"
+else
+  az postgres flexible-server firewall-rule create \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$POSTGRES_SERVER" \
+    --rule-name AllowAzureServices \
+    --start-ip-address 0.0.0.0 \
+    --end-ip-address 0.0.0.0 \
+    --output none
+  ok_step "Firewall liberado para Azure"
+fi
 
 # 5. App Service Plan
 info_step "[5/9] App Service Plan"
-az appservice plan create \
-  --resource-group "$RESOURCE_GROUP" \
-  --name "$APP_PLAN" \
-  --location "$LOCATION" \
-  --sku B1 \
-  --is-linux \
-  --output none
-ok_step "Plano criado"
+if az appservice plan show --resource-group "$RESOURCE_GROUP" --name "$APP_PLAN" >/dev/null 2>&1; then
+  ok_step "Plano reutilizado"
+else
+  az appservice plan create \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$APP_PLAN" \
+    --location "$LOCATION" \
+    --sku B1 \
+    --is-linux \
+    --output none
+  ok_step "Plano criado"
+fi
 
 # 6. Web App
 info_step "[6/9] Web App (Java 21)"
-az webapp create \
-  --resource-group "$RESOURCE_GROUP" \
-  --plan "$APP_PLAN" \
-  --name "$APP_NAME" \
-  --runtime "JAVA:21-java21" \
-  --output none
-ok_step "Web App pronta"
+if az webapp show --resource-group "$RESOURCE_GROUP" --name "$APP_NAME" >/dev/null 2>&1; then
+  ok_step "Web App reutilizada"
+else
+  az webapp create \
+    --resource-group "$RESOURCE_GROUP" \
+    --plan "$APP_PLAN" \
+    --name "$APP_NAME" \
+    --runtime "JAVA:21-java21" \
+    --output none
+  ok_step "Web App criada"
+fi
 
 # 7. Connection string
 info_step "[7/9] Connection String"
