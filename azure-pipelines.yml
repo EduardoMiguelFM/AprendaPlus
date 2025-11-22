@@ -1,101 +1,67 @@
-# Azure Pipeline YAML para Build e Deploy
-# Pipeline de CI/CD para o projeto Aprenda+
+# Azure Pipeline YAML para Build e Testes - Aprenda+
+# Pipeline de CI/CD baseado na estrutura do MotoVision
 
 trigger:
   branches:
     include:
-      - main
       - master
+      - main
+
+pr:
+  branches:
+    include:
+      - master
+      - main
 
 pool:
-  vmImage: "ubuntu-latest"
+  vmImage: ubuntu-latest
 
 variables:
-  mavenVersion: "3.9.5"
   javaVersion: "21"
-  resourceGroup: "rg-aprenda-plus"
-  webAppName: "aprenda-plus"
 
 stages:
-  - stage: Build
-    displayName: "Build e Testes"
+  - stage: BuildAndTest
+    displayName: Build and Test
     jobs:
-      - job: BuildJob
-        displayName: "Compilar e Testar"
+      - job: Build
+        displayName: Gradle Build
         steps:
+          - checkout: self
+            displayName: Checkout repository
+
           - task: JavaToolInstaller@0
+            displayName: "Set up JDK"
             inputs:
               versionSpec: "$(javaVersion)"
-              jdkArchitecture: "x64"
-              jdkSource: "PreInstalled"
+              jdkArchitectureOption: "x64"
+              jdkSourceOption: "PreInstalled"
 
-          - task: Maven@4
-            displayName: "Maven Build"
+          - script: chmod +x gradlew
+            displayName: "Make gradlew executable"
+            condition: eq(variables['Agent.OS'], 'Linux')
+
+          - task: Gradle@3
+            displayName: "Gradle clean build test"
             inputs:
-              mavenPomFile: "pom.xml"
-              goals: "clean package"
-              options: "-DskipTests=false"
+              workingDirectory: ""
+              gradleWrapperFile: "gradlew"
+              tasks: "clean build test"
               publishJUnitResults: true
-              testResultsFiles: "**/surefire-reports/TEST-*.xml"
+              testResultsFiles: "**/TEST-*.xml"
               javaHomeOption: "JDKVersion"
-              jdkVersionOption: "$(javaVersion)"
+              jdkVersionOption: "1.21"
               jdkArchitectureOption: "x64"
 
           - task: PublishTestResults@2
-            displayName: "Publicar Resultados dos Testes"
+            displayName: "Publicar resultados de testes"
+            condition: succeededOrFailed()
             inputs:
               testResultsFormat: "JUnit"
               testResultsFiles: "**/TEST-*.xml"
-              failTaskOnFailedTests: true
-
-          - task: PublishCodeCoverageResults@1
-            displayName: "Publicar Cobertura de Código"
-            inputs:
-              codeCoverageTool: "JaCoCo"
-              summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml"
 
           - task: PublishBuildArtifacts@1
-            displayName: "Publicar Artefatos"
+            displayName: "Publicar artefatos"
             inputs:
-              PathtoPublish: "$(System.DefaultWorkingDirectory)/target/*.jar"
-              ArtifactName: "drop"
+              pathToPublish: "$(System.DefaultWorkingDirectory)/build/libs"
+              artifactName: "aprenda-plus-jar"
               publishLocation: "Container"
-
-  - stage: Deploy
-    displayName: "Deploy para Azure"
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - deployment: DeployJob
-        displayName: "Deploy Web App"
-        environment: "production"
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureWebApp@1
-                  displayName: "Deploy para Azure Web App"
-                  inputs:
-                    azureSubscription: "Azure-Service-Connection"
-                    appName: "$(webAppName)"
-                    package: "$(Pipeline.Workspace)/drop/*.jar"
-                    runtimeStack: "JAVA|17"
-                    startUpCommand: "java -jar app.jar"
-
-                - task: AzureCLI@2
-                  displayName: "Verificar Deploy"
-                  inputs:
-                    azureSubscription: "Azure-Service-Connection"
-                    scriptType: "bash"
-                    scriptLocation: "inlineScript"
-                    inlineScript: |
-                      echo "Verificando status da aplicação..."
-                      az webapp show --name $(webAppName) --resource-group $(resourceGroup) --query state
-
-
-
-
-
-
-
-

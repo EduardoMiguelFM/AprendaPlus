@@ -49,9 +49,9 @@ application-local.properties
 .DS_Store
 Thumbs.db
 
-# Discipline-specific README files
-README-JAVA.md
+### Documentação Interna (não commitada) ###
+README-ENTREGAS-GS.md
 README-DEVOPS.md
+README-JAVA.md
 README-QA.md
-README-MOBILE.md
-README.m
+README-MOBILE.md    
