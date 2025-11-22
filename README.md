@@ -23,6 +23,19 @@ WebApp completo construído com **Spring Boot** que oferece **experiências gami
 
 ---
 
+## 🧱 Entidades com CRUD Completo
+
+| Entidade            | API (Swagger)                                                             | Interface Web                                        | Uso mobile/API                  |
+| ------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------- |
+| **Cursos**          | `GET/POST/PUT/DELETE /api/cursos`                                         | `/cursos`, `/cursos/{id}` (listar, ver, inscrever)   | Consumido pelo app mobile e web |
+| **Trilhas**         | `GET/POST/PUT/DELETE /api/trilhas`                                        | `/trilhas`, `/trilhas/{id}`                          | Dados recomendados para mobile  |
+| **Desafios**        | `GET/POST/PUT/DELETE /api/desafios` + `POST /api/desafios/{id}/completar` | `/desafios`, `/desafios/{id}`, `/desafios/{id}/quiz` | Integrado ao front e à IA       |
+| **Usuários/Perfil** | `POST /api/auth/*`, `GET/PUT /api/usuarios`                               | `/perfil`, `/login`, `/cadastro`                     | Mobile usa as mesmas APIs       |
+
+Todos os módulos foram exercitados via UI e documentados no Swagger, garantindo cobertura REST e web.
+
+---
+
 ## 🧪 Tecnologias Utilizadas
 
 - **Java 21**
