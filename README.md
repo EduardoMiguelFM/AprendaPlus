@@ -44,7 +44,6 @@ Todos os módulos foram exercitados via UI e documentados no Swagger, garantindo
 - **Spring Security 6**
 - **Spring Validation**
 - **Spring AI + OpenAI**
-- **RabbitMQ** (mensageria)
 - **Caffeine Cache**
 - **Thymeleaf + Bootstrap**
 - **Flyway** (migração de banco)
@@ -104,7 +103,7 @@ docker run -p 8080:8080 -e SPRING_AI_OPENAI_API_KEY=sk-proj-sua-chave aprenda-pl
 ### ☁️ Deploy no Azure (resumo)
 
 1. `./gradlew clean bootJar`
-2. Crie App Service + PostgreSQL conforme [README-DEVOPS.md](README-DEVOPS.md)
+2. Crie App Service + PostgreSQL conforme Script 'deploy-aprendaplus-cloud.sh'
 3. Configure variáveis no App Service:
    - `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
    - `SPRING_PROFILES_ACTIVE=cloud`
@@ -139,6 +138,7 @@ docker run -p 8080:8080 -e SPRING_AI_OPENAI_API_KEY=sk-proj-sua-chave aprenda-pl
 - Endpoint: `POST /api/ia/chat`
 - Responde dúvidas sobre cursos, progresso e próximos passos
 - Contextualiza com pontos e estatísticas do usuário
+- indica cursos com base nos seus interesses
 
 ---
 
@@ -178,7 +178,498 @@ Aprenda+/
 | IA Assistente | `POST /api/ia/chat`                                           |
 | Perfil (Web)  | `/perfil`, `/perfil/preferencias`, `/perfil/atualizar`        |
 
-> Documentação completa disponível no Swagger e em `README-JAVA.md`.
+## 📡 Exemplos de CRUD (JSON)
+
+### 📚 Cursos
+
+#### Listar Cursos (GET)
+
+```http
+GET /api/cursos?pagina=0&tamanho=10
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "dados": [
+      {
+        "id": 1,
+        "titulo": "Java Avançado",
+        "descricao": "Curso completo de Java com Spring Boot",
+        "area": "programacao",
+        "duracao": "40 horas",
+        "nivel": "Avançado",
+        "icone": "💻",
+        "instrutor": "Prof. João Silva",
+        "avaliacao": 4.8,
+        "totalAulas": 20
+      }
+    ],
+    "paginacao": {
+      "pagina": 0,
+      "tamanho": 10,
+      "total": 50,
+      "totalPaginas": 5
+    }
+  },
+  "mensagem": "Cursos recuperados com sucesso"
+}
+```
+
+#### Obter Curso por ID (GET)
+
+```http
+GET /api/cursos/1
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "titulo": "Java Avançado",
+    "descricao": "Curso completo de Java com Spring Boot",
+    "area": "programacao",
+    "duracao": "40 horas",
+    "nivel": "Avançado",
+    "icone": "💻",
+    "conteudo": "Módulos: 1. Spring Framework, 2. JPA/Hibernate, 3. REST APIs",
+    "instrutor": "Prof. João Silva",
+    "avaliacao": 4.8,
+    "totalAulas": 20
+  },
+  "mensagem": "Curso recuperado com sucesso"
+}
+```
+
+#### Inscrever-se em Curso (POST)
+
+```http
+POST /api/cursos/1/inscrever
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "usuario": {...},
+    "curso": {...},
+    "status": "em_andamento",
+    "progresso": 0,
+    "inscritoEm": "2025-01-15T10:30:00"
+  },
+  "mensagem": "Inscrição realizada com sucesso"
+}
+```
+
+#### Atualizar Progresso do Curso (PUT)
+
+```http
+PUT /api/cursos/1/progresso?progresso=50
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "progresso": 50,
+    "status": "em_andamento"
+  },
+  "mensagem": "Progresso atualizado com sucesso"
+}
+```
+
+---
+
+### 🎯 Trilhas
+
+#### Listar Trilhas (GET)
+
+```http
+GET /api/trilhas?pagina=0&tamanho=10
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "dados": [
+      {
+        "id": 1,
+        "titulo": "Trilha Full Stack Java",
+        "descricao": "Aprenda desenvolvimento completo com Java",
+        "area": "programacao",
+        "nivelMinimo": "Iniciante",
+        "icone": "🚀",
+        "cor": "#007bff",
+        "cursos": [...],
+        "desafios": [...]
+      }
+    ],
+    "paginacao": {
+      "pagina": 0,
+      "tamanho": 10,
+      "total": 15,
+      "totalPaginas": 2
+    }
+  },
+  "mensagem": "Trilhas recuperadas com sucesso"
+}
+```
+
+#### Obter Trilha por ID (GET)
+
+```http
+GET /api/trilhas/1
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "titulo": "Trilha Full Stack Java",
+    "descricao": "Aprenda desenvolvimento completo com Java",
+    "area": "programacao",
+    "nivelMinimo": "Iniciante",
+    "icone": "🚀",
+    "cor": "#007bff",
+    "cursos": [
+      {
+        "id": 1,
+        "titulo": "Java Básico",
+        "nivel": "Iniciante"
+      },
+      {
+        "id": 2,
+        "titulo": "Spring Boot",
+        "nivel": "Intermediário"
+      }
+    ]
+  },
+  "mensagem": "Trilha recuperada com sucesso"
+}
+```
+
+#### Inscrever-se em Trilha (POST)
+
+```http
+POST /api/trilhas/1/inscrever
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "usuario": {...},
+    "trilha": {...},
+    "inscritoEm": "2025-01-15T10:30:00"
+  },
+  "mensagem": "Inscrição na trilha realizada com sucesso"
+}
+```
+
+#### Obter Progresso da Trilha (GET)
+
+```http
+GET /api/trilhas/1/progresso
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "progressoGeral": 45,
+    "cursosCompletos": 2,
+    "totalCursos": 5,
+    "desafiosCompletos": 1,
+    "totalDesafios": 3
+  },
+  "mensagem": "Progresso recuperado com sucesso"
+}
+```
+
+---
+
+### 🧠 Desafios
+
+#### Listar Desafios (GET)
+
+```http
+GET /api/desafios?area=programacao&nivel=Intermediário&tipo=quiz
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "dados": [
+      {
+        "id": 1,
+        "titulo": "Quiz de Java",
+        "descricao": "Teste seus conhecimentos em Java",
+        "tipo": "quiz",
+        "area": "programacao",
+        "nivel": "Intermediário",
+        "pontos": 200,
+        "icone": "🧠",
+        "dificuldade": "Médio"
+      }
+    ],
+    "paginacao": {
+      "pagina": 0,
+      "tamanho": 20,
+      "total": 25,
+      "totalPaginas": 2
+    }
+  },
+  "mensagem": "Desafios recuperados com sucesso"
+}
+```
+
+#### Obter Desafio por ID (GET)
+
+```http
+GET /api/desafios/1
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "titulo": "Quiz de Java",
+    "descricao": "Teste seus conhecimentos em Java",
+    "tipo": "quiz",
+    "area": "programacao",
+    "nivel": "Intermediário",
+    "pontos": 200,
+    "icone": "🧠",
+    "dificuldade": "Médio"
+  },
+  "mensagem": "Desafio recuperado com sucesso"
+}
+```
+
+#### Obter Perguntas do Desafio (GET)
+
+```http
+GET /api/desafios/1/perguntas
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": [
+    {
+      "id": 1,
+      "pergunta": "O que é Spring Boot?",
+      "opcoes": [
+        "Framework Java",
+        "Linguagem de programação",
+        "Banco de dados",
+        "Editor de código"
+      ],
+      "respostaCorreta": 0
+    }
+  ],
+  "mensagem": "Perguntas recuperadas com sucesso"
+}
+```
+
+#### Completar Desafio (POST)
+
+```http
+POST /api/desafios/1/completar
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "respostas": [
+    {"perguntaId": 1, "resposta": 0},
+    {"perguntaId": 2, "resposta": 1}
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "pontosGanhos": 200,
+    "pontuacao": 85,
+    "totalPerguntas": 10
+  },
+  "mensagem": "Desafio concluído com sucesso"
+}
+```
+
+#### Verificar Status do Desafio (GET)
+
+```http
+GET /api/desafios/1/status
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "completo": true,
+    "concluidoEm": "2025-01-15T11:00:00",
+    "pontuacao": 85,
+    "pontosGanhos": 200
+  },
+  "mensagem": "Status recuperado com sucesso"
+}
+```
+
+---
+
+### 👤 Usuários
+
+#### Cadastrar Usuário (POST)
+
+```http
+POST /api/auth/cadastro
+Content-Type: application/json
+
+{
+  "nome": "João Silva",
+  "email": "joao.silva@fiap.com.br",
+  "senha": "SenhaSegura123!",
+  "confirmarSenha": "SenhaSegura123!"
+}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "nome": "João Silva",
+    "email": "joao.silva@fiap.com.br"
+  },
+  "mensagem": "Usuário cadastrado com sucesso"
+}
+```
+
+#### Login (POST)
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao.silva@fiap.com.br",
+  "senha": "SenhaSegura123!"
+}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "usuario": {
+      "id": 1,
+      "nome": "João Silva",
+      "email": "joao.silva@fiap.com.br"
+    }
+  },
+  "mensagem": "Login realizado com sucesso"
+}
+```
+
+#### Obter Perfil (GET)
+
+```http
+GET /api/usuarios/perfil
+Authorization: Bearer {token}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "nome": "João Silva",
+    "email": "joao.silva@fiap.com.br",
+    "pontos": 1250,
+    "nivel": "Intermediário"
+  },
+  "mensagem": "Perfil recuperado com sucesso"
+}
+```
+
+#### Atualizar Perfil (PUT)
+
+```http
+PUT /api/usuarios/perfil
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "nome": "João Silva Santos",
+  "telefone": "(11) 98765-4321"
+}
+```
+
+**Response:**
+
+```json
+{
+  "sucesso": true,
+  "dados": {
+    "id": 1,
+    "nome": "João Silva Santos",
+    "email": "joao.silva@fiap.com.br",
+    "telefone": "(11) 98765-4321"
+  },
+  "mensagem": "Perfil atualizado com sucesso"
+}
+```
 
 ---
 
@@ -203,10 +694,6 @@ Aprenda+/
 
 ## 📹 Vídeos & Documentação
 
-- [README-JAVA.md](README-JAVA.md) – Detalhes técnicos Java Advanced
-- [README-DEVOPS.md](README-DEVOPS.md) – Deploy completo no Azure
-- [README-QA.md](README-QA.md) – Qualidade e testes
-- [README-MOBILE.md](README-MOBILE.md) – Integração com app mobile
 - Vídeos de apresentação (links fornecidos na banca – atualize aqui se necessário)
 
 ---

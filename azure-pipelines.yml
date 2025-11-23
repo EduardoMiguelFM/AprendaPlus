@@ -54,13 +54,14 @@ stages:
 
           - task: PublishTestResults@2
             displayName: "Publicar resultados de testes"
-            condition: succeededOrFailed()
+            condition: always()
             inputs:
               testResultsFormat: "JUnit"
               testResultsFiles: "**/TEST-*.xml"
 
           - task: PublishBuildArtifacts@1
             displayName: "Publicar artefatos"
+            condition: succeededOrFailed()
             inputs:
               pathToPublish: "$(System.DefaultWorkingDirectory)/build/libs"
               artifactName: "aprenda-plus-jar"

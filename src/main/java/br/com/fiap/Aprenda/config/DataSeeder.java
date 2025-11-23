@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class DataSeeder {
 
         @Bean
         @Transactional
+        @Profile("!test")
         public CommandLineRunner seedData() {
                 return args -> {
                         if (cursoRepository.count() == 0) {
