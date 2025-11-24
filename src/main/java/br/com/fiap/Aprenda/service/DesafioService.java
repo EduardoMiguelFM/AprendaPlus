@@ -36,24 +36,46 @@ public class DesafioService {
     private final GamificacaoService servicoGamificacao;
     private final TrofeuRepository trofeuRepository;
 
+    @Transactional(readOnly = true)
     @Cacheable(value = "challenges")
     public Page<Desafio> listarTodos(String area, String nivel, String tipo, Pageable pageable) {
+        Page<Desafio> desafios;
         if (area != null && nivel != null) {
-            return desafioRepository.findByAreaAndNivel(area, nivel, pageable);
+            desafios = desafioRepository.findByAreaAndNivel(area, nivel, pageable);
         } else if (area != null) {
-            return desafioRepository.findByArea(area, pageable);
+            desafios = desafioRepository.findByArea(area, pageable);
         } else if (nivel != null) {
-            return desafioRepository.findByNivel(nivel, pageable);
+            desafios = desafioRepository.findByNivel(nivel, pageable);
         } else if (tipo != null) {
-            return desafioRepository.findByTipo(tipo, pageable);
+            desafios = desafioRepository.findByTipo(tipo, pageable);
+        } else {
+            desafios = desafioRepository.findAll(pageable);
         }
-        return desafioRepository.findAll(pageable);
+        // Forçar inicialização das coleções lazy antes de fechar a sessão
+        desafios.getContent().forEach(desafio -> {
+            if (desafio.getPerguntas() != null) {
+                desafio.getPerguntas().size();
+            }
+            if (desafio.getUsuariosDesafios() != null) {
+                desafio.getUsuariosDesafios().size();
+            }
+        });
+        return desafios;
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = "challenges", key = "#id")
     public Desafio obterPorId(Long id) {
-        return desafioRepository.findById(id)
+        Desafio desafio = desafioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Desafio não encontrado"));
+        // Forçar inicialização das coleções lazy antes de fechar a sessão
+        if (desafio.getPerguntas() != null) {
+            desafio.getPerguntas().size();
+        }
+        if (desafio.getUsuariosDesafios() != null) {
+            desafio.getUsuariosDesafios().size();
+        }
+        return desafio;
     }
 
     @Transactional(readOnly = true)
@@ -167,5 +189,41 @@ public class DesafioService {
         }
 
         return perguntaDesafioRepository.saveAll(novasPerguntas);
+    }
+
+    @Transactional
+    public Desafio criar(Desafio desafio) {
+        return desafioRepository.save(desafio);
+    }
+
+    @Transactional
+    public Desafio atualizar(Long id, Desafio desafioAtualizado) {
+        Desafio desafioExistente = desafioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Desafio não encontrado"));
+
+        desafioExistente.setTipo(desafioAtualizado.getTipo());
+        desafioExistente.setArea(desafioAtualizado.getArea());
+        desafioExistente.setNivel(desafioAtualizado.getNivel());
+        desafioExistente.setTitulo(desafioAtualizado.getTitulo());
+        desafioExistente.setDescricao(desafioAtualizado.getDescricao());
+        desafioExistente.setPontos(desafioAtualizado.getPontos());
+        desafioExistente.setIcone(desafioAtualizado.getIcone());
+        desafioExistente.setDificuldade(desafioAtualizado.getDificuldade());
+
+        Desafio desafioSalvo = desafioRepository.save(desafioExistente);
+        // Forçar inicialização das coleções lazy antes de fechar a sessão
+        if (desafioSalvo.getPerguntas() != null) {
+            desafioSalvo.getPerguntas().size();
+        }
+        if (desafioSalvo.getUsuariosDesafios() != null) {
+            desafioSalvo.getUsuariosDesafios().size();
+        }
+        return desafioSalvo;
+    }
+
+    @Transactional
+    public void deletar(Long id) {
+        Desafio desafio = obterPorId(id);
+        desafioRepository.delete(desafio);
     }
 }

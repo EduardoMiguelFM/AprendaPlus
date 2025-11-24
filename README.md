@@ -60,7 +60,7 @@ Todos os módulos foram exercitados via UI e documentados no Swagger, garantindo
 #### 1. Clonar o projeto
 
 ```bash
-git clone https://github.com/seu-usuario/aprenda-plus.git
+git clone https://github.com/EduardoMiguelFM/AprendaPlus.git
 cd Aprenda+
 ```
 
@@ -93,6 +93,8 @@ setx SPRING_AI_OPENAI_API_KEY "sk-proj-sua-chave-aqui"
 - Dashboard: `http://localhost:8080/dashboard`
 - Swagger: `http://localhost:8080/swagger-ui.html`
 
+> **💡 Aplicação em Produção**: Acesse [https://aprendaplus-web-0703.azurewebsites.net/](https://aprendaplus-web-0703.azurewebsites.net/) para testar a versão deployada
+
 ### 🐳 Execução com Docker
 
 ```bash
@@ -100,7 +102,24 @@ docker build -t aprenda-plus .
 docker run -p 8080:8080 -e SPRING_AI_OPENAI_API_KEY=sk-proj-sua-chave aprenda-plus
 ```
 
-### ☁️ Deploy no Azure (resumo)
+### ☁️ Deploy no Azure
+
+#### Opção 1: Script Automatizado (Recomendado)
+
+```bash
+# Execute o script de deploy completo
+./scripts/deploy-aprendaplus-cloud.sh
+```
+
+O script automatiza:
+
+1. Criação do Resource Group
+2. Provisionamento do PostgreSQL Flexible Server
+3. Criação do App Service Plan e Web App
+4. Configuração de variáveis de ambiente
+5. Build e deploy do JAR
+
+#### Opção 2: Manual
 
 1. `./gradlew clean bootJar`
 2. Crie App Service + PostgreSQL conforme Script 'deploy-aprendaplus-cloud.sh'
@@ -694,7 +713,17 @@ Content-Type: application/json
 
 ## 📹 Vídeos & Documentação
 
-- Vídeos de apresentação (links fornecidos na banca – atualize aqui se necessário)
+### 🎥 Vídeos de Apresentação
+
+- **Vídeo Pitch (JAVA)**: [Assistir no YouTube](https://youtu.be/vFQ52cdzKfk)
+- **Vídeo Funcionalidades (JAVA)**: [Assistir no YouTube](https://youtu.be/y3EUrky8pig)
+- **Vídeo DEVOPS**: [Assistir no YouTube](https://youtu.be/rJ5AEc8tutU)
+
+### 🔗 Links Importantes
+
+- **Repositório GitHub**: [https://github.com/EduardoMiguelFM/AprendaPlus.git](https://github.com/EduardoMiguelFM/AprendaPlus.git)
+- **Aplicação em Nuvem**: [https://aprendaplus-web-0703.azurewebsites.net/](https://aprendaplus-web-0703.azurewebsites.net/)
+
 
 ---
 

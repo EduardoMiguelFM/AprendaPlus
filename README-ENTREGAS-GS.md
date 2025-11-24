@@ -351,35 +351,48 @@ Repita para **Trilhas** e **Desafios**.
 1. Vá em **Boards** > **Backlogs**
 2. Mude a visualização para **Features**
 3. Clique em **New Work Item** > **Feature**
-4. Crie Features para cada funcionalidade principal:
-   - **Feature 1**: "Sistema de Autenticação"
-     - **Description**: "Permitir cadastro, login e gerenciamento de perfil"
-     - **Acceptance Criteria**:
-       - ✅ Usuário pode se cadastrar com email e senha
-       - ✅ Usuário pode fazer login
-       - ✅ Usuário pode atualizar perfil
-   - **Feature 2**: "Gerenciamento de Cursos"
-     - **Description**: "Visualizar, inscrever e acompanhar cursos"
-     - **Acceptance Criteria**:
-       - ✅ Listar cursos disponíveis
-       - ✅ Ver detalhes do curso
-       - ✅ Inscrever-se em curso
-       - ✅ Acompanhar progresso
-   - **Feature 3**: "Sistema de Desafios"
-     - **Description**: "Realizar desafios e ganhar pontos"
-     - **Acceptance Criteria**:
-       - ✅ Listar desafios disponíveis
-       - ✅ Iniciar quiz de desafio
-       - ✅ Submeter respostas
-       - ✅ Receber pontuação
-   - **Feature 4**: "Assistente IA"
-     - **Description**: "Interagir com assistente inteligente"
-     - **Acceptance Criteria**:
-       - ✅ Enviar pergunta ao assistente
-       - ✅ Receber resposta contextualizada
-5. **Tire prints** de:
-   - Lista de Features
-   - Detalhes de cada Feature (com descrição e critérios)
+4. Crie Features para cada funcionalidade principal (consulte **[docs/FEATURES-AZURE-BOARDS.md](./docs/FEATURES-AZURE-BOARDS.md)** para lista completa):
+
+   **Lista Completa de Features (20 Features)**:
+
+   **Priority 1 - Critical**:
+   - Autenticação e Cadastro (Effort: 5)
+   - Dashboard Gamificado (Effort: 8)
+   - Gestão de Cursos - CRUD Completo (Effort: 13)
+   - API REST com Swagger (Effort: 8)
+   - Interface Web Responsiva (Effort: 13)
+   - Segurança com Spring Security (Effort: 8)
+   - Migração de Banco (Flyway) (Effort: 5)
+   - Deploy em Nuvem Azure (Effort: 13)
+
+   **Priority 2 - High**:
+   - Onboarding Inteligente (Effort: 8)
+   - Gestão de Trilhas - CRUD Completo (Effort: 13)
+   - Sistema de Desafios e Quiz (Effort: 13)
+   - Perfil do Usuário (Effort: 8)
+   - Sistema de Gamificação (Pontos, Troféus, Ranking) (Effort: 13)
+   - Paginação em Listagens (Effort: 3)
+   - Tratamento Global de Exceções (Effort: 5)
+
+   **Priority 3 - Medium**:
+   - Assistente IA (Spring AI + OpenAI) (Effort: 13)
+   - Cache com Caffeine (Effort: 5)
+   - Monitoramento com Actuator (Effort: 3)
+   - Processamento Assíncrono (Effort: 8)
+
+   **Priority 4 - Low**:
+   - Internacionalização (pt-BR / en-US) (Effort: 5)
+
+5. Para cada Feature, preencha:
+   - **Title**: Nome da Feature
+   - **Description**: Descrição completa da funcionalidade
+   - **Acceptance Criteria**: Lista de critérios de aceite
+   - **Priority**: 1 (Critical), 2 (High), 3 (Medium) ou 4 (Low)
+   - **Effort**: Story points (1-21+)
+
+6. **Tire prints** de:
+   - Lista de Features (mostrando Priority e Effort)
+   - Detalhes de cada Feature (com descrição, critérios, priority e effort)
 
 #### **Passo 2: Criar Test Plan**
 
@@ -394,41 +407,33 @@ Repita para **Trilhas** e **Desafios**.
 #### **Passo 3: Criar Test Suites e Test Cases**
 
 1. No Test Plan, clique em **+ Add** > **New Test Suite** > **Requirement-based**
-2. Selecione uma **Feature** (ex: "Sistema de Autenticação")
+2. Selecione uma **Feature** (ex: "Autenticação e Cadastro de Usuários")
 3. Isso cria uma Test Suite vinculada à Feature
 4. Clique em **+ New** > **New Test Case**
-5. Configure o Test Case:
+5. Configure o Test Case seguindo o documento **[docs/TEST-SUITES-CASES.md](./docs/TEST-SUITES-CASES.md)**
 
-**Exemplo: Test Case - Cadastro de Usuário**
+**Documento Completo**: Consulte `docs/TEST-SUITES-CASES.md` para:
+- ✅ **20 Test Suites** (uma para cada Feature)
+- ✅ **56 Test Cases** detalhados com:
+  - Pré-requisitos
+  - Passos detalhados (Action + Expected Result)
+  - Param Values (quando aplicável)
+  - Cobertura completa de todas as funcionalidades
+
+**Estrutura de cada Test Case**:
+- **Title**: ID e descrição do teste
+- **Pré-requisitos**: Condições necessárias antes de executar
+- **Passos**: Tabela com Step, Action e Expected Result
+- **Param Values**: Valores parametrizados para testes com múltiplos cenários
+
+**Exemplo: Test Case - Cadastro de Usuário (TC001)**
 
 - **Title**: "TC001 - Cadastrar novo usuário com sucesso"
-- **Sumário** (pré-requisitos):
-```
+- **Pré-requisitos**: Aplicação rodando, banco conectado, email não cadastrado
+- **Passos**: 7 passos detalhados
+- **Param Values**: Múltiplos conjuntos de dados de teste
 
-Pré-requisitos:
-
-- Aplicação rodando em https://aprendaplus-web-xxxxx.azurewebsites.net
-- Banco de dados conectado e migrado
-- Nenhum usuário com email "teste@fiap.com.br" cadastrado
-
-```
-- **Passos** (usando Param Values):
-| Step | Action | Expected Result |
-|------|--------|----------------|
-| 1 | Acessar `/cadastro` | Página de cadastro carrega |
-| 2 | Preencher nome: `{{nome}}` | Campo preenchido |
-| 3 | Preencher email: `{{email}}` | Campo preenchido |
-| 4 | Preencher senha: `{{senha}}` | Campo preenchido |
-| 5 | Clicar em "Cadastrar" | Usuário criado, redireciona para login |
-| 6 | Verificar no banco | Registro existe na tabela `usuario` |
-
-- **Param Values** (aba separada):
-| nome | email | senha |
-|------|-------|-------|
-| João Silva | joao@teste.com | senha123 |
-| Maria Santos | maria@teste.com | senha456 |
-
-6. Repita para cada Feature (mínimo 1 Test Case por Feature)
+6. Repita para todas as 20 Features (56 Test Cases no total)
 
 #### **Passo 4: Executar Testes**
 
@@ -456,12 +461,16 @@ Pré-requisitos:
 
 1. Crie um documento Word/Google Docs
 2. Inclua:
- - **Capa**: Nome do grupo, RMs, nomes completos
- - **Link do projeto**: `https://dev.azure.com/<org>/<projeto>/_overview`
- - **Seção 1**: Prints das Features (lista + detalhes)
- - **Seção 2**: Prints dos Test Cases (sumário + passos)
- - **Seção 3**: Prints das execuções (passo a passo + resumo)
- - **Seção 4**: Gráficos (Outcome + Run by)
+   - **Capa**: Nome do grupo, RMs, nomes completos
+   - **Link do projeto**: `https://dev.azure.com/<org>/<projeto>/_overview`
+   - **Seção 1**: Prints das Features (lista + detalhes)
+   - **Seção 2**: Prints dos Test Cases (exemplos representativos - sumário + passos)
+     - Incluir alguns Test Cases representativos (com e sem Param Values)
+     - Não é necessário incluir todos os 56 Test Cases
+   - **Seção 3**: Prints das execuções (exemplos representativos - passo a passo + resumo)
+     - Incluir algumas execuções de exemplo
+     - Mostrar diferentes tipos de resultados (Passed, Failed se houver)
+   - **Seção 4**: Gráficos (Outcome + Run by)
 3. Exporte como **PDF**
 4. Nomeie: `GS_<nomeGrupo>.pdf`
 

@@ -7,10 +7,12 @@ import br.com.fiap.Aprenda.service.CursoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -125,5 +127,32 @@ public class CursoController {
     public ResponseEntity<RespostaApi<UsuarioCurso>> obterProgresso(@PathVariable Long cursoId) {
         UsuarioCurso usuarioCurso = servicoCurso.obterProgresso(cursoId);
         return ResponseEntity.ok(RespostaApi.sucesso(usuarioCurso, "Progresso recuperado com sucesso"));
+    }
+
+    @PostMapping
+    @Operation(summary = "Criar novo curso")
+    @SecurityRequirement(name = "basicAuth")
+    public ResponseEntity<RespostaApi<Curso>> criar(@Valid @RequestBody Curso curso) {
+        Curso cursoCriado = servicoCurso.criar(curso);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(RespostaApi.sucesso(cursoCriado, "Curso criado com sucesso"));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar curso")
+    @SecurityRequirement(name = "basicAuth")
+    public ResponseEntity<RespostaApi<Curso>> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody Curso curso) {
+        Curso cursoAtualizado = servicoCurso.atualizar(id, curso);
+        return ResponseEntity.ok(RespostaApi.sucesso(cursoAtualizado, "Curso atualizado com sucesso"));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar curso")
+    @SecurityRequirement(name = "basicAuth")
+    public ResponseEntity<RespostaApi<Void>> deletar(@PathVariable Long id) {
+        servicoCurso.deletar(id);
+        return ResponseEntity.ok(RespostaApi.sucesso(null, "Curso deletado com sucesso"));
     }
 }

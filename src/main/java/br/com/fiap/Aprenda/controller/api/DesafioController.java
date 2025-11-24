@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -117,5 +118,32 @@ public class DesafioController {
         }
 
         return ResponseEntity.ok(RespostaApi.sucesso(status, "Status recuperado com sucesso"));
+    }
+
+    @PostMapping
+    @Operation(summary = "Criar novo desafio")
+    @SecurityRequirement(name = "basicAuth")
+    public ResponseEntity<RespostaApi<Desafio>> criar(@Valid @RequestBody Desafio desafio) {
+        Desafio desafioCriado = servicoDesafio.criar(desafio);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(RespostaApi.sucesso(desafioCriado, "Desafio criado com sucesso"));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar desafio")
+    @SecurityRequirement(name = "basicAuth")
+    public ResponseEntity<RespostaApi<Desafio>> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody Desafio desafio) {
+        Desafio desafioAtualizado = servicoDesafio.atualizar(id, desafio);
+        return ResponseEntity.ok(RespostaApi.sucesso(desafioAtualizado, "Desafio atualizado com sucesso"));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar desafio")
+    @SecurityRequirement(name = "basicAuth")
+    public ResponseEntity<RespostaApi<Void>> deletar(@PathVariable Long id) {
+        servicoDesafio.deletar(id);
+        return ResponseEntity.ok(RespostaApi.sucesso(null, "Desafio deletado com sucesso"));
     }
 }

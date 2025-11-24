@@ -137,22 +137,44 @@ public class CursoService {
     private final PreferenciasUsuarioRepository preferenciasRepository;
     private final GamificacaoService servicoGamificacao;
 
+    @Transactional(readOnly = true)
     @Cacheable(value = "courses")
     public Page<Curso> listarTodos(String area, String nivel, Pageable pageable) {
+        Page<Curso> cursos;
         if (area != null && nivel != null) {
-            return cursoRepository.findByAreaAndNivel(area, nivel, pageable);
+            cursos = cursoRepository.findByAreaAndNivel(area, nivel, pageable);
         } else if (area != null) {
-            return cursoRepository.findByArea(area, pageable);
+            cursos = cursoRepository.findByArea(area, pageable);
         } else if (nivel != null) {
-            return cursoRepository.findByNivel(nivel, pageable);
+            cursos = cursoRepository.findByNivel(nivel, pageable);
+        } else {
+            cursos = cursoRepository.findAll(pageable);
         }
-        return cursoRepository.findAll(pageable);
+        // Forçar inicialização das coleções lazy antes de fechar a sessão
+        cursos.getContent().forEach(curso -> {
+            if (curso.getUsuariosCursos() != null) {
+                curso.getUsuariosCursos().size();
+            }
+            if (curso.getTrilhas() != null) {
+                curso.getTrilhas().size();
+            }
+        });
+        return cursos;
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = "courses", key = "#id")
     public Curso obterPorId(Long id) {
-        return cursoRepository.findById(id)
+        Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Curso não encontrado"));
+        // Forçar inicialização das coleções lazy antes de fechar a sessão
+        if (curso.getUsuariosCursos() != null) {
+            curso.getUsuariosCursos().size();
+        }
+        if (curso.getTrilhas() != null) {
+            curso.getTrilhas().size();
+        }
+        return curso;
     }
 
     @Transactional(readOnly = true)
@@ -455,5 +477,43 @@ public class CursoService {
     }
 
     public record CursoConclusaoResultado(boolean cursoConcluido, int pontosGanhos) {
+    }
+
+    @Transactional
+    public Curso criar(Curso curso) {
+        return cursoRepository.save(curso);
+    }
+
+    @Transactional
+    public Curso atualizar(Long id, Curso cursoAtualizado) {
+        Curso cursoExistente = cursoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Curso não encontrado"));
+
+        cursoExistente.setTitulo(cursoAtualizado.getTitulo());
+        cursoExistente.setDescricao(cursoAtualizado.getDescricao());
+        cursoExistente.setArea(cursoAtualizado.getArea());
+        cursoExistente.setDuracao(cursoAtualizado.getDuracao());
+        cursoExistente.setNivel(cursoAtualizado.getNivel());
+        cursoExistente.setIcone(cursoAtualizado.getIcone());
+        cursoExistente.setConteudo(cursoAtualizado.getConteudo());
+        cursoExistente.setInstrutor(cursoAtualizado.getInstrutor());
+        cursoExistente.setAvaliacao(cursoAtualizado.getAvaliacao());
+        cursoExistente.setTotalAulas(cursoAtualizado.getTotalAulas());
+
+        Curso cursoSalvo = cursoRepository.save(cursoExistente);
+        // Forçar inicialização das coleções lazy antes de fechar a sessão
+        if (cursoSalvo.getUsuariosCursos() != null) {
+            cursoSalvo.getUsuariosCursos().size();
+        }
+        if (cursoSalvo.getTrilhas() != null) {
+            cursoSalvo.getTrilhas().size();
+        }
+        return cursoSalvo;
+    }
+
+    @Transactional
+    public void deletar(Long id) {
+        Curso curso = obterPorId(id);
+        cursoRepository.delete(curso);
     }
 }

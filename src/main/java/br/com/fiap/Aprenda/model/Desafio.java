@@ -1,5 +1,6 @@
 package br.com.fiap.Aprenda.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -66,10 +67,12 @@ public class Desafio {
     private LocalDateTime atualizadoEm;
 
     @OneToMany(mappedBy = "desafio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     @Builder.Default
     private List<PerguntaDesafio> perguntas = new ArrayList<>();
 
     @OneToMany(mappedBy = "desafio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     @Builder.Default
     private List<UsuarioDesafio> usuariosDesafios = new ArrayList<>();
 
